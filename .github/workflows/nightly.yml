@@ -1,0 +1,22 @@
+name: nightly-gtfs-tables
+on:
+  schedule:
+    - cron: "17 10 * * *"   # 10:17 UTC ≈ 2:17/3:17 AM Pacific
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci
+      - run: node preprocess.mjs
+      - name: Commit updated tables
+        run: |
+          git config user.name "cce-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add tables/
+          git diff --cached --quiet || (git commit -m "tables $(date -u +%F)" && git push)
