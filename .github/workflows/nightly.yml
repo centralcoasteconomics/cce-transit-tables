@@ -13,10 +13,26 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: npm ci
-      - run: node preprocess.mjs
+
+      # preprocess.mjs exits non-zero when a county refuses to publish (every feed
+      # failed, or the stop count collapsed against last night). That must NOT stop the
+      # healthy counties from being committed — one bad feed should never hold eight good
+      # tables hostage. So: let it fail, commit whatever it did produce, then fail the job
+      # afterwards so the run goes red and the failure is visible.
+      - id: build
+        run: node preprocess.mjs
+        continue-on-error: true
+
       - name: Commit updated tables
+        if: always()
         run: |
           git config user.name "cce-bot"
           git config user.email "actions@users.noreply.github.com"
           git add tables/
           git diff --cached --quiet || (git commit -m "tables $(date -u +%F)" && git push)
+
+      - name: Fail the run if any county did not publish
+        if: steps.build.outcome == 'failure'
+        run: |
+          echo "One or more counties were held back — see the build step log."
+          exit 1

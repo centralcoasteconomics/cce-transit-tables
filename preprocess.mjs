@@ -14,7 +14,7 @@
 import { readFile } from 'node:fs/promises'
 import { unzipSync, strFromU8 } from 'fflate'
 import { parse } from 'csv-parse/sync'
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs'
 
 const AM_START = 7 * 3600, AM_END = 9 * 3600
 const PM_START = 16 * 3600, PM_END = 18 * 3600
@@ -206,8 +206,23 @@ async function processFeed(feed) {
   return { refDate, stops: out }
 }
 
+/** Below this share of the previous run's stop count, keep the old table and shout. */
+const RETAIN_THRESHOLD = 0.5
+/** Below this share, publish but say so — real service changes look like this. */
+const WARN_THRESHOLD = 0.9
+
+function readTable(path) {
+  try {
+    const t = JSON.parse(readFileSync(path, 'utf8'))
+    return Array.isArray(t?.stops) ? t : null
+  } catch {
+    return null
+  }
+}
+
 mkdirSync('tables', { recursive: true })
 const summary = []
+const failures = []
 for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   console.log(`${county}:`)
   const stops = []
@@ -231,10 +246,47 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   if (stops.length === 0) {
     console.error(`  ${county}: no stops from any feed — leaving the existing table untouched`)
     summary.push(`${county}: SKIPPED (0 stops, ${labels.length}/${feeds.length} feeds)`)
+    failures.push(`${county}: 0 stops from ${feeds.length} feed(s)`)
     continue
   }
+
+  // COLLAPSE GUARD. The zero case above is the loud failure; this is the quiet one. A
+  // feed that starts serving a partial or malformed extract still parses, still yields
+  // stops, and would overwrite a good table with a much worse one — and nothing would
+  // say so, because the file is machine-generated and nobody reads the diff. Orange
+  // County spent days at zero before a human noticed. Anything below RETAIN_THRESHOLD of
+  // last night's count keeps the previous table and reports loudly; a smaller dip is
+  // reported but still published, because real service changes do happen.
+  const prevPath = `tables/${county}.json`
+  const prev = existsSync(prevPath) ? readTable(prevPath) : null
+  if (prev && prev.stops.length > 0) {
+    const ratio = stops.length / prev.stops.length
+    if (ratio < RETAIN_THRESHOLD) {
+      const pct = Math.round((1 - ratio) * 100)
+      console.error(
+        `  ${county}: stop count COLLAPSED ${prev.stops.length} -> ${stops.length} (-${pct}%) — refusing to publish, keeping the previous table`
+      )
+      summary.push(`${county}: HELD (${stops.length} vs ${prev.stops.length} last run, -${pct}%)`)
+      failures.push(`${county}: stop count fell ${pct}% (${prev.stops.length} -> ${stops.length})`)
+      continue
+    }
+    if (ratio < WARN_THRESHOLD) {
+      const pct = Math.round((1 - ratio) * 100)
+      console.warn(`  ${county}: stop count down ${pct}% (${prev.stops.length} -> ${stops.length}) — publishing, but check the feed`)
+    }
+  }
+
   const table = { generatedAt: new Date().toISOString(), county, refDate, feeds: labels, stops }
   writeFileSync(`tables/${county}.json`, JSON.stringify(table))
-  summary.push(`${county}: ${stops.length} stops, ${labels.length}/${feeds.length} feeds`)
+  const delta = prev && prev.stops.length ? ` (was ${prev.stops.length})` : ''
+  summary.push(`${county}: ${stops.length} stops${delta}, ${labels.length}/${feeds.length} feeds`)
 }
 console.log('\n' + summary.join('\n'))
+
+// Exit non-zero so the nightly GitHub Action goes red. A pipeline that fails silently and
+// commits a degraded table is exactly how Orange County sat at zero stops unnoticed.
+if (failures.length) {
+  console.error(`\n${failures.length} county/counties did not publish:`)
+  for (const f of failures) console.error(`  - ${f}`)
+  process.exitCode = 1
+}
