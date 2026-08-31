@@ -11,6 +11,7 @@
  * Output: tables/<county>.json
  * Parity source: app src/main/connectors/transit/gtfs.ts (2026-08; keep in sync).
  */
+import { readFile } from 'node:fs/promises'
 import { unzipSync, strFromU8 } from 'fflate'
 import { parse } from 'csv-parse/sync'
 import { writeFileSync, mkdirSync } from 'node:fs'
@@ -18,21 +19,15 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 const AM_START = 7 * 3600, AM_END = 9 * 3600
 const PM_START = 16 * 3600, PM_END = 18 * 3600
 
-const COUNTY_FEEDS = {
-  ventura: [{ id: 'govcbus', url: 'https://govcbus.com/gtfs', label: 'Ventura County (combined GTFS)' }],
-  'los-angeles': [
-    { id: 'lametro_bus', url: 'https://gitlab.com/LACMTA/gtfs_bus/-/raw/master/gtfs_bus.zip', label: 'LA Metro Bus' },
-    { id: 'lametro_rail', url: 'https://gitlab.com/LACMTA/gtfs_rail/-/raw/master/gtfs_rail.zip', label: 'LA Metro Rail' },
-    { id: 'foothill', url: 'https://foothilltransit.rideralerts.com/myStop/GTFS-Zip.ashx', label: 'Foothill Transit' },
-    { id: 'ladot', url: 'https://ladotbus.com/gtfs', label: 'LADOT (DASH/Commuter Express)' },
-    { id: 'bigbluebus', url: 'https://gtfs.bigbluebus.com/current.zip', label: 'Big Blue Bus (Santa Monica)' }
-  ],
-  'santa-barbara': [{ id: 'sbmtd', url: 'https://www.sbmtd.gov/google_transit/feed.zip', label: 'Santa Barbara MTD' }],
-  'san-luis-obispo': [
-    { id: 'slorta', url: 'http://slo.connexionz.net/rtt/public/resource/gtfs.zip', label: 'SLO Regional Transit Authority' },
-    { id: 'slotransit', url: 'http://slocity.connexionz.net/rtt/public/resource/gtfs.zip', label: 'SLO Transit (city)' }
-  ]
-}
+// Feeds come from the app's shared registry so the two can never drift. If that file is
+// unreachable (a standalone CI checkout), fail loudly rather than silently building
+// tables for fewer counties than the app believes are covered.
+const REGISTRY_URL = new URL('./transitFeeds.json', import.meta.url)
+const registry = JSON.parse(await readFile(REGISTRY_URL, 'utf8'))
+// Canonical keys are lowercase-with-spaces; table filenames are hyphenated.
+const COUNTY_FEEDS = Object.fromEntries(
+  Object.entries(registry.counties).map(([k, v]) => [k.replace(/\s+/g, '-'), v])
+)
 
 const toSec = (t) => {
   if (!t) return null
@@ -83,14 +78,31 @@ const freqCountInWindow = (f, ws, we) => {
 const routeTypeToStop = (rt) => rt === 0 ? 'light_rail' : rt === 1 ? 'rail' : rt === 2 ? 'commuter_rail' : rt === 4 ? 'ferry' : 'bus_stop'
 const RANK = ['bus_stop', 'bus_station', 'brt', 'light_rail', 'commuter_rail', 'rail', 'ferry']
 
+function unquote(v) {
+  if (v.length >= 2 && v.charCodeAt(0) === 34 && v.charCodeAt(v.length - 1) === 34) {
+    return v.slice(1, -1).replace(/""/g, '"')
+  }
+  return v
+}
+
+/**
+ * Extract the values at the given (ascending) column indices in one pass.
+ *
+ * Quote-aware, matching pick() in the app's connectors/transit/gtfs.ts: a comma inside a
+ * quoted field (a stop_headsign like "Main St, Anaheim" is the common case) must not be
+ * counted as a separator, or every column after it shifts and the wrong values are read —
+ * silently, with plausible-looking output.
+ */
 function pick(line, start, end, wanted) {
   const res = new Array(wanted.length).fill('')
   const maxCol = wanted[wanted.length - 1]
-  let col = 0, fieldStart = start
+  let col = 0, fieldStart = start, inQuotes = false
   for (let i = start; i <= end; i++) {
-    if (i === end || line.charCodeAt(i) === 44) {
+    const ch = i < end ? line.charCodeAt(i) : 0
+    if (i < end && ch === 34 /* " */) { inQuotes = !inQuotes; continue }
+    if (i === end || (ch === 44 /* , */ && !inQuotes)) {
       const wi = wanted.indexOf(col)
-      if (wi >= 0) res[wi] = line.slice(fieldStart, i)
+      if (wi >= 0) res[wi] = unquote(line.slice(fieldStart, i))
       col++; fieldStart = i + 1
       if (col > maxCol) break
     }
@@ -135,8 +147,20 @@ async function processFeed(feed) {
   const stBuf = zip['stop_times.txt']
   if (!stBuf) throw new Error('no stop_times.txt')
   const text = strFromU8(stBuf)
-  const header = text.slice(0, text.indexOf('\n')).replace(/\r$/, '').split(',').map((h) => h.trim())
-  const colTrip = header.indexOf('trip_id'), colDep = header.indexOf('departure_time'), colStop = header.indexOf('stop_id')
+  // GTFS permits quoted CSV and a UTF-8 BOM. Everything else in the feed goes through a
+  // real CSV parser, but stop_times.txt is scanned by hand because it is tens of
+  // megabytes — so the header must be de-BOM'd and unquoted here too. OCTA publishes
+  // `\ufeff"trip_id","arrival_time",...`, which made every column index -1 and skipped
+  // the whole feed: Orange County reported no transit at all. Fixed in the app engine
+  // (connectors/transit/gtfs.ts) 2026-08; ported here 2026-08-31 to restore parity.
+  const header = text
+    .slice(0, text.indexOf('\n'))
+    .replace(/\r$/, '')
+    .replace(/^\ufeff/, '')
+    .split(',')
+    .map((h) => unquote(h.trim()))
+  const colTrip = header.indexOf('trip_id'), colStop = header.indexOf('stop_id')
+  const colDep = header.indexOf('departure_time') >= 0 ? header.indexOf('departure_time') : header.indexOf('arrival_time')
   if (colTrip < 0 || colDep < 0 || colStop < 0) throw new Error('stop_times missing columns')
   const wanted = [colTrip, colDep, colStop].slice().sort((a, b) => a - b)
   const iTrip = wanted.indexOf(colTrip), iDep = wanted.indexOf(colDep), iStop = wanted.indexOf(colStop)
@@ -198,6 +222,16 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
     } catch (e) {
       console.error(`  ${feed.id}: FAILED — ${e.message} (keeping previous table's data absent for this feed)`)
     }
+  }
+  // A county whose every feed failed must NOT get an empty table published. The Worker
+  // treats a table it can fetch as authoritative, so `{"stops":[]}` would state "no
+  // transit here" with confidence — a false negative that silently caps TCAC transit
+  // points. A MISSING table makes the Worker fall back instead, which is the honest
+  // answer. Leaving the previous night's table in place is better still.
+  if (stops.length === 0) {
+    console.error(`  ${county}: no stops from any feed — leaving the existing table untouched`)
+    summary.push(`${county}: SKIPPED (0 stops, ${labels.length}/${feeds.length} feeds)`)
+    continue
   }
   const table = { generatedAt: new Date().toISOString(), county, refDate, feeds: labels, stops }
   writeFileSync(`tables/${county}.json`, JSON.stringify(table))

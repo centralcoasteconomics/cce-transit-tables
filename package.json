@@ -2,7 +2,7 @@
   "name": "cce-transit-tables",
   "private": true,
   "type": "module",
-  "description": "Nightly GTFS preprocessing for Site Due Diligence's cloud engine — compact per-stop peak-headway tables for Ventura, LA, Santa Barbara, and SLO counties.",
+  "description": "Nightly GTFS preprocessing for Site Due Diligence's cloud engine — compact per-stop peak-headway tables for Ventura, LA, Santa Barbara, SLO, Riverside, San Bernardino, and Monterey counties.",
   "dependencies": {
     "csv-parse": "^5.6.0",
     "fflate": "^0.8.2"

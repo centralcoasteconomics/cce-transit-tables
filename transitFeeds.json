@@ -1,0 +1,137 @@
+{
+  "_doc": "Single source of truth for county GTFS feeds. BOTH consumers read this file: the app (connectors/transit/feeds.ts) and the nightly pipeline (cce-transit-tables/preprocess.mjs). Keys are canonical lowercase-with-spaces; each consumer normalizes as it needs. These previously lived in two hand-synced registries with different key styles, so a drift surfaced as the Mac and the edge disagreeing about a site's transit \u2014 the hardest kind of bug to notice.",
+  "notWired": {
+    "imperial": "No published GTFS feed found in the Mobility Database catalog."
+  },
+  "counties": {
+    "los angeles": [
+      {
+        "id": "lametro_bus",
+        "url": "https://gitlab.com/LACMTA/gtfs_bus/-/raw/master/gtfs_bus.zip",
+        "label": "LA Metro Bus"
+      },
+      {
+        "id": "lametro_rail",
+        "url": "https://gitlab.com/LACMTA/gtfs_rail/-/raw/master/gtfs_rail.zip",
+        "label": "LA Metro Rail"
+      },
+      {
+        "id": "foothill",
+        "url": "https://foothilltransit.rideralerts.com/myStop/GTFS-Zip.ashx",
+        "label": "Foothill Transit"
+      },
+      {
+        "id": "ladot",
+        "url": "https://ladotbus.com/gtfs",
+        "label": "LADOT (DASH/Commuter Express)"
+      },
+      {
+        "id": "bigbluebus",
+        "url": "https://gtfs.bigbluebus.com/current.zip",
+        "label": "Big Blue Bus (Santa Monica)"
+      }
+    ],
+    "monterey": [
+      {
+        "id": "mst",
+        "url": "https://www.mst.org/google/google_transit.zip",
+        "label": "Monterey-Salinas Transit"
+      }
+    ],
+    "orange": [
+      {
+        "id": "octa",
+        "url": "https://www.octa.net/current/google_transit.zip",
+        "label": "Orange County Transportation Authority"
+      }
+    ],
+    "riverside": [
+      {
+        "id": "rta",
+        "url": "http://www.riversidetransit.com/google_transit.zip",
+        "label": "Riverside Transit Agency"
+      },
+      {
+        "id": "sunline",
+        "url": "http://www.sunline.org/transit/google_transit.zip",
+        "label": "SunLine Transit (Coachella Valley)"
+      },
+      {
+        "id": "corona",
+        "url": "http://data.trilliumtransit.com/gtfs/corona-ca-us/corona-ca-us.zip",
+        "label": "Corona Cruiser"
+      },
+      {
+        "id": "beaumont",
+        "url": "http://data.trilliumtransit.com/gtfs/beaumont-ca-us/beaumont-ca-us.zip",
+        "label": "Beaumont Transit"
+      },
+      {
+        "id": "banning",
+        "url": "http://data.trilliumtransit.com/gtfs/banning-ca-us/banning-ca-us.zip",
+        "label": "Banning Transit"
+      }
+    ],
+    "san bernardino": [
+      {
+        "id": "omnitrans",
+        "url": "http://www.omnitrans.org/google/google_transit.zip",
+        "label": "Omnitrans (San Bernardino Valley)"
+      },
+      {
+        "id": "vvta",
+        "url": "http://data.trilliumtransit.com/gtfs/victorville-ca-us/victorville-ca-us.zip",
+        "label": "Victor Valley Transit Authority"
+      },
+      {
+        "id": "mountaintransit",
+        "url": "http://data.trilliumtransit.com/gtfs/bigbear-ca-us/bigbear-ca-us.zip",
+        "label": "Mountain Transit (Big Bear)"
+      },
+      {
+        "id": "morongo",
+        "url": "http://data.trilliumtransit.com/gtfs/morongobasin-ca-us/morongobasin-ca-us.zip",
+        "label": "Morongo Basin Transit"
+      }
+    ],
+    "san diego": [
+      {
+        "id": "mts",
+        "url": "https://storage.googleapis.com/storage/v1/b/mdb-latest/o/us-california-san-diego-international-airport-metropolitan-transit-system-mts-gtfs-13.zip?alt=media",
+        "label": "San Diego MTS (Mobility Database mirror)"
+      },
+      {
+        "id": "nctd",
+        "url": "https://lfportal.nctd.org/staticGTFS/google_transit.zip",
+        "label": "North County Transit District"
+      }
+    ],
+    "san luis obispo": [
+      {
+        "id": "slorta",
+        "url": "http://slo.connexionz.net/rtt/public/resource/gtfs.zip",
+        "label": "SLO Regional Transit Authority"
+      },
+      {
+        "id": "slotransit",
+        "url": "http://slocity.connexionz.net/rtt/public/resource/gtfs.zip",
+        "label": "SLO Transit (city)"
+      }
+    ],
+    "santa barbara": [
+      {
+        "id": "sbmtd",
+        "url": "https://www.sbmtd.gov/google_transit/feed.zip",
+        "label": "Santa Barbara MTD"
+      }
+    ],
+    "ventura": [
+      {
+        "id": "govcbus",
+        "url": "https://govcbus.com/gtfs",
+        "label": "Ventura County (combined GTFS)"
+      }
+    ]
+  },
+  "_mirrorNote": "MTS is served from the Mobility Database mirror because sdmts.com refuses connections from non-browser clients (verified 2026-08-29, same failure class as FEMA). The mirror was checked for currency before wiring \u2014 service window and feed_version both current \u2014 and the feed-vintage machinery will flag it if the mirror ever falls behind."
+}
