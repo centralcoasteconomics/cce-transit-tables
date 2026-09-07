@@ -48,7 +48,7 @@
     "riverside": [
       {
         "id": "rta",
-        "url": "http://www.riversidetransit.com/google_transit.zip",
+        "url": "https://www.riversidetransit.com/google_transit.zip",
         "label": "Riverside Transit Agency"
       },
       {
