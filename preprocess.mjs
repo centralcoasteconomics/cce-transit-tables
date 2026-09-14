@@ -110,11 +110,45 @@ function pick(line, start, end, wanted) {
   return res
 }
 
+// Download a feed and open the zip, trying twice. Between 9/8 and 9/12 four of six
+// nightly runs went red on `invalid zip data` / `fetch failed` from feeds that answered
+// 200 with a real zip on every probe from a Mac, and always came back the next night —
+// transient runner-side failures (a challenge page or a reset mid-download), the same
+// class as the retry-once rule for ArcGIS and Cloudflare. The collapse alarm already
+// keeps a bad download from corrupting a table; this keeps a transient one from turning
+// the run red. When the bytes are not a zip, log what they were, so a real block (an
+// HTML challenge page, 403, wrong content-type) is diagnosable from the run log instead
+// of guessed at — see the misdiagnosis of 2026-09-07.
+const DOWNLOAD_ATTEMPTS = 2
+const RETRY_DELAY_MS = 20_000
+async function downloadZip(feed) {
+  let lastErr
+  for (let attempt = 1; attempt <= DOWNLOAD_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(feed.url, { headers: { 'User-Agent': 'cce-transit-tables (Central Coast Economics; nightly GTFS preprocessing)' }, redirect: 'follow' })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const bytes = new Uint8Array(await res.arrayBuffer())
+      try {
+        return unzipSync(bytes)
+      } catch (e) {
+        const ct = res.headers.get('content-type') ?? '?'
+        const head = strFromU8(bytes.subarray(0, 80)).replace(/\s+/g, ' ').trim()
+        throw new Error(`${e.message} (content-type ${ct}, ${bytes.length} bytes, starts "${head.slice(0, 60)}")`)
+      }
+    } catch (e) {
+      lastErr = e
+      if (attempt < DOWNLOAD_ATTEMPTS) {
+        console.warn(`  ${feed.id}: attempt ${attempt} failed — ${e.message}; retrying in ${RETRY_DELAY_MS / 1000}s`)
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS))
+      }
+    }
+  }
+  throw lastErr
+}
+
 async function processFeed(feed) {
   console.log(`  ${feed.id}: downloading ${feed.url}`)
-  const res = await fetch(feed.url, { headers: { 'User-Agent': 'cce-transit-tables (Central Coast Economics; nightly GTFS preprocessing)' }, redirect: 'follow' })
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  const zip = unzipSync(new Uint8Array(await res.arrayBuffer()))
+  const zip = await downloadZip(feed)
   const stops = new Map()
   for (const r of csv(zip['stops.txt'])) {
     const lat = Number(r.stop_lat), lng = Number(r.stop_lon)
@@ -223,7 +257,11 @@ function readTable(path) {
 mkdirSync('tables', { recursive: true })
 const summary = []
 const failures = []
+// ONLY=monterey,riverside limits a local run to named counties (verification only; the
+// nightly job never sets it, so it always builds every table).
+const only = (process.env.ONLY ?? '').split(',').map((s) => s.trim()).filter(Boolean)
 for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
+  if (only.length && !only.includes(county)) continue
   console.log(`${county}:`)
   const stops = []
   const labels = []
