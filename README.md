@@ -6,5 +6,6 @@ cloud engine consumes (`tables/<county>.json`). Parity source: the desktop engin
 `transit/gtfs.ts` — the headway math (120min ÷ departures; ≤30-min frequency test)
 is applied downstream from these counts, identically in both engines.
 Runs nightly via GitHub Actions; run locally with `npm ci && node preprocess.mjs`.
-Data: publicly published GTFS from VCTC, LA Metro, Foothill, LADOT, Big Blue Bus,
-SBMTD, SLO RTA, SLO Transit.
+Data: publicly published GTFS from the agencies listed in `transitFeeds.json` (94 feeds
+across 51 California counties as of 2026-09-15; the file is synced from the app's
+`src/shared/transitFeeds.json` and carries the reasons for the 7 counties left unwired).

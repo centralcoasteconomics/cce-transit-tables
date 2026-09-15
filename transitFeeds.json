@@ -1,9 +1,151 @@
 {
   "_doc": "Single source of truth for county GTFS feeds. BOTH consumers read this file: the app (connectors/transit/feeds.ts) and the nightly pipeline (cce-transit-tables/preprocess.mjs). Keys are canonical lowercase-with-spaces; each consumer normalizes as it needs. These previously lived in two hand-synced registries with different key styles, so a drift surfaced as the Mac and the edge disagreeing about a site's transit \u2014 the hardest kind of bug to notice.",
   "notWired": {
-    "imperial": "No published GTFS feed found in the Mobility Database catalog."
+    "imperial": "No published GTFS feed found in the Mobility Database catalog.",
+    "alameda": "AC Transit \u2014 the county's primary operator \u2014 publishes GTFS only through api.actransit.org (401 without a token) and 511.org (API key); its open-data zips are archived snapshots whose last (Aug 2025) calendar ended 2025-12-06. Wiring BART, Emery Go-Round and LAVTA without it would report Oakland/Berkeley/Hayward bus sites as unserved. Verified 2026-09-15.",
+    "alpine": "No GTFS feed exists: not in the Mobility Database catalog, the Transitland atlas, or Cal-ITP\u2019s monthly feed reports (2026-09-15).",
+    "colusa": "No GTFS feed exists for Colusa County Transit: not in the Mobility Database catalog, the Transitland atlas, or Cal-ITP\u2019s monthly feed reports; the Trillium slug colusa-ca-us is a 404 (2026-09-15).",
+    "del norte": "Redwood Coast Transit's only published feed (Trillium delnorte-ca-us, the URL Transitland and Cal-ITP still point at) parses but its calendar ended 2025-10-08 \u2014 342 days stale at wiring time, beyond the 120-day limit. Re-check when the agency republishes (2026-09-15).",
+    "sierra": "No GTFS feed exists: not in the Mobility Database catalog, the Transitland atlas, or Cal-ITP\u2019s monthly feed reports (2026-09-15).",
+    "tehama": "TRAX's only published feed (Trillium tehama-ca-us) has a calendar that ended 2019-01-09 \u2014 seven years stale. Not wired until the agency republishes (2026-09-15)."
+  },
+  "_gaps": {
+    "_doc": "Wired counties whose registry is knowingly incomplete, so a \"no transit\" result near one of these operators is read as a gap in coverage rather than a fact. Each was checked 2026-09-15.",
+    "contra costa": "Tri Delta Transit (East County: Antioch, Pittsburg, Brentwood, Oakley) publishes only via 511.org (API key). County Connection, WestCAT and BART are wired.",
+    "kern": "Taft Area Transit and Ridgecrest Transit publish only static document uploads (no refreshable URL); Wasco is a flex feed. GET, Kern Transit, Delano and Arvin are wired.",
+    "madera": "Madera Metro (City of Madera) \u2014 Trillium feed calendar ended 2024-02-07 and Cal-ITP's Aug 2026 report still lists that source. Only Madera County Connection (which also serves the city) is wired.",
+    "placer": "Auburn Transit publishes only a static document upload (6 stops). Placer County Transit, TART and Roseville are wired.",
+    "solano": "Fairfield and Suisun Transit (FAST) and Vacaville City Coach publish only via 511.org (API key); their Trillium feeds ended 2025-07 and 2026-02. Rio Vista Delta Breeze\u2019s feed ended 2021. Only SolTrans (Vallejo/Benicia) is wired.",
+    "sonoma": "Petaluma Transit publishes only via 511.org (API key). Sonoma County Transit, Santa Rosa CityBus and SMART are wired.",
+    "tulare": "Porterville Transit's Trillium feed calendar ended 2022-10-12. TCRTA and Visalia Transit are wired."
   },
   "counties": {
+    "amador": [
+      {
+        "id": "amador",
+        "url": "https://data.trilliumtransit.com/gtfs/amador-ca-us/amador-ca-us.zip",
+        "label": "Amador Transit"
+      }
+    ],
+    "butte": [
+      {
+        "id": "bline",
+        "url": "https://planmyride.blinetransit.com/gtfsrealtime/google_transit.zip",
+        "label": "Butte Regional Transit (B-Line)"
+      }
+    ],
+    "calaveras": [
+      {
+        "id": "calaveras",
+        "url": "https://data.trilliumtransit.com/gtfs/calaveras-ca-us/calaveras-ca-us.zip",
+        "label": "Calaveras Connect"
+      }
+    ],
+    "contra costa": [
+      {
+        "id": "countyconnection",
+        "url": "https://countyconnection.com/GTFS/google_transit.zip",
+        "label": "County Connection (CCCTA)"
+      },
+      {
+        "id": "westcat",
+        "url": "https://data.trilliumtransit.com/gtfs/westcat-ca-us/westcat-ca-us.zip",
+        "label": "WestCAT"
+      },
+      {
+        "id": "bart_cc",
+        "url": "https://www.bart.gov/dev/schedules/google_transit.zip",
+        "label": "BART"
+      }
+    ],
+    "el dorado": [
+      {
+        "id": "eldorado",
+        "url": "https://data.trilliumtransit.com/gtfs/eldoradotransit-ca-us/eldoradotransit-ca-us.zip",
+        "label": "El Dorado Transit"
+      }
+    ],
+    "fresno": [
+      {
+        "id": "fax",
+        "url": "https://gis4u.fresno.gov/downloads/fax_gtfs.zip",
+        "label": "Fresno Area Express (FAX)"
+      },
+      {
+        "id": "fcrta",
+        "url": "https://rapid.nationalrtap.org/GTFSFileManagement/UserUploadFiles/7869/google_transit.zip",
+        "label": "Fresno County Rural Transit Agency"
+      },
+      {
+        "id": "clovis",
+        "url": "https://passio3.com/clovis/passioTransit/gtfs/google_transit.zip",
+        "label": "Clovis Transit"
+      }
+    ],
+    "glenn": [
+      {
+        "id": "glenn",
+        "url": "https://gtfs.remix.com/glenncounty.zip",
+        "label": "Glenn Transit Service"
+      }
+    ],
+    "humboldt": [
+      {
+        "id": "hta",
+        "url": "https://hta.optibus.co/public_api/v1/feeds/gtfs",
+        "label": "Humboldt Transit Authority"
+      }
+    ],
+    "inyo": [
+      {
+        "id": "easternsierra",
+        "url": "https://data.trilliumtransit.com/gtfs/easternsierra-ca-us/easternsierra-ca-us.zip",
+        "label": "Eastern Sierra Transit"
+      }
+    ],
+    "kern": [
+      {
+        "id": "get",
+        "url": "http://eta.getbus.org/rtt/public/resource/gtfs.zip",
+        "label": "Golden Empire Transit (Bakersfield)"
+      },
+      {
+        "id": "kerntransit",
+        "url": "https://data.trilliumtransit.com/gtfs/kerncounty-ca-us/kerncounty-ca-us.zip",
+        "label": "Kern Transit"
+      },
+      {
+        "id": "delano",
+        "url": "https://data.trilliumtransit.com/gtfs/delano-ca-us/delano-ca-us.zip",
+        "label": "Delano Area Rapid Transit"
+      },
+      {
+        "id": "arvin",
+        "url": "https://gtfs.remix.com/arvin.zip",
+        "label": "Arvin Transit"
+      }
+    ],
+    "kings": [
+      {
+        "id": "kart",
+        "url": "https://kart.connexionz.net/rtt/public/resource/gtfs.zip",
+        "label": "Kings Area Rural Transit"
+      }
+    ],
+    "lake": [
+      {
+        "id": "laketransit",
+        "url": "https://data.trilliumtransit.com/gtfs/laketransit-ca-us/laketransit-ca-us.zip",
+        "label": "Lake Transit Authority"
+      }
+    ],
+    "lassen": [
+      {
+        "id": "lassen",
+        "url": "https://data.trilliumtransit.com/gtfs/lassen-ca-us/lassen-ca-us.zip",
+        "label": "Lassen Rural Bus"
+      }
+    ],
     "los angeles": [
       {
         "id": "lametro_bus",
@@ -31,6 +173,60 @@
         "label": "Big Blue Bus (Santa Monica)"
       }
     ],
+    "madera": [
+      {
+        "id": "maderacounty",
+        "url": "https://data.trilliumtransit.com/gtfs/maderactc-ca-us/maderactc-ca-us.zip",
+        "label": "Madera County Connection"
+      }
+    ],
+    "marin": [
+      {
+        "id": "marintransit",
+        "url": "https://marintransit.gov/data/google_transit.zip",
+        "label": "Marin Transit"
+      },
+      {
+        "id": "goldengate",
+        "url": "https://realtime.goldengate.org/gtfsstatic/GTFSTransitData.zip",
+        "label": "Golden Gate Transit"
+      }
+    ],
+    "mariposa": [
+      {
+        "id": "yarts",
+        "url": "https://www.planeteria.com/gtfs/yosemite-ca-us/yosemite-ca-us-gtfs.zip",
+        "label": "YARTS"
+      }
+    ],
+    "mendocino": [
+      {
+        "id": "mta",
+        "url": "https://data.trilliumtransit.com/gtfs/mendocino-ca-us/mendocino-ca-us.zip",
+        "label": "Mendocino Transit Authority"
+      }
+    ],
+    "merced": [
+      {
+        "id": "thebus",
+        "url": "https://thebuslive.com/gtfs",
+        "label": "Merced County Transit (The Bus)"
+      }
+    ],
+    "modoc": [
+      {
+        "id": "sagestage",
+        "url": "https://data.trilliumtransit.com/gtfs/sagestage-ca-us/sagestage-ca-us.zip",
+        "label": "Sage Stage"
+      }
+    ],
+    "mono": [
+      {
+        "id": "easternsierra_mono",
+        "url": "https://data.trilliumtransit.com/gtfs/easternsierra-ca-us/easternsierra-ca-us.zip",
+        "label": "Eastern Sierra Transit"
+      }
+    ],
     "monterey": [
       {
         "id": "mst",
@@ -38,11 +234,49 @@
         "label": "Monterey-Salinas Transit"
       }
     ],
+    "napa": [
+      {
+        "id": "vine",
+        "url": "https://data.trilliumtransit.com/gtfs/vinetransit-ca-us/vinetransit-ca-us.zip",
+        "label": "VINE Transit"
+      }
+    ],
+    "nevada": [
+      {
+        "id": "nevadacountyconnects",
+        "url": "https://gtfs.remix.com/nevada_county_connects.zip",
+        "label": "Nevada County Connects (Gold Country Stage)"
+      }
+    ],
     "orange": [
       {
         "id": "octa",
         "url": "https://www.octa.net/current/google_transit.zip",
         "label": "Orange County Transportation Authority"
+      }
+    ],
+    "placer": [
+      {
+        "id": "placercounty",
+        "url": "https://data.trilliumtransit.com/gtfs/placercounty-ca-us/placercounty-ca-us.zip",
+        "label": "Placer County Transit"
+      },
+      {
+        "id": "tart",
+        "url": "https://data.trilliumtransit.com/gtfs/laketahoe-ca-us/laketahoe-ca-us.zip",
+        "label": "TART (North Lake Tahoe)"
+      },
+      {
+        "id": "roseville",
+        "url": "https://cityofroseville.tripshot.com/v1/gtfs.zip?regionId=CA558DDC-D7F2-4B48-9CAC-DEEA1134F820",
+        "label": "Roseville Transit"
+      }
+    ],
+    "plumas": [
+      {
+        "id": "plumas",
+        "url": "https://data.trilliumtransit.com/gtfs/plumas-ca-us/plumas-ca-us.zip",
+        "label": "Plumas Transit"
       }
     ],
     "riverside": [
@@ -70,6 +304,30 @@
         "id": "banning",
         "url": "http://data.trilliumtransit.com/gtfs/banning-ca-us/banning-ca-us.zip",
         "label": "Banning Transit"
+      }
+    ],
+    "sacramento": [
+      {
+        "id": "sacrt",
+        "url": "https://apps.sacrt.com/gtfs/srtd/google_transit.zip",
+        "label": "Sacramento Regional Transit (SacRT)"
+      },
+      {
+        "id": "etran",
+        "url": "https://iportal.sacrt.com/gtfs/eg/google_transit.zip",
+        "label": "SacRT e-tran (Elk Grove)"
+      },
+      {
+        "id": "sctlink",
+        "url": "https://iportal.sacrt.com/gtfs/SCTLink/google_transit.zip",
+        "label": "South County Transit Link"
+      }
+    ],
+    "san benito": [
+      {
+        "id": "sbce",
+        "url": "https://data.trilliumtransit.com/gtfs/sanbenitocounty-ca-us/sanbenitocounty-ca-us.zip",
+        "label": "San Benito County Express"
       }
     ],
     "san bernardino": [
@@ -106,6 +364,55 @@
         "label": "North County Transit District"
       }
     ],
+    "san francisco": [
+      {
+        "id": "sfmta",
+        "url": "https://muni-gtfs.apps.sfmta.com/data/muni_gtfs-current.zip",
+        "label": "SFMTA (Muni)"
+      },
+      {
+        "id": "bart",
+        "url": "https://www.bart.gov/dev/schedules/google_transit.zip",
+        "label": "BART"
+      },
+      {
+        "id": "caltrain_sf",
+        "url": "https://data.trilliumtransit.com/gtfs/caltrain-ca-us/caltrain-ca-us.zip",
+        "label": "Caltrain"
+      },
+      {
+        "id": "weta",
+        "url": "https://gtfs.sanfranciscobayferry.com/gtfs.zip",
+        "label": "San Francisco Bay Ferry (WETA)"
+      }
+    ],
+    "san joaquin": [
+      {
+        "id": "sjrtd",
+        "url": "https://sanjoaquinrtd.com/RTD-GTFS/RTD-GTFS.zip",
+        "label": "San Joaquin RTD"
+      },
+      {
+        "id": "grapeline",
+        "url": "https://www.lodi.gov/DocumentCenter/View/2453/lodi_gtfs-ZIP",
+        "label": "Lodi GrapeLine"
+      },
+      {
+        "id": "tracer",
+        "url": "https://s3.amazonaws.com/etatransit.gtfs/tracer.etaspot.net/gtfs.zip",
+        "label": "Tracy TRACER"
+      },
+      {
+        "id": "mantecatransit",
+        "url": "https://s3.amazonaws.com/etatransit.gtfs/mantecatransit.etaspot.net/gtfs.zip",
+        "label": "Manteca Transit"
+      },
+      {
+        "id": "escalon",
+        "url": "https://data.trilliumtransit.com/gtfs/escalon-ca-us/escalon-ca-us.zip",
+        "label": "eTrans (Escalon)"
+      }
+    ],
     "san luis obispo": [
       {
         "id": "slorta",
@@ -118,11 +425,145 @@
         "label": "SLO Transit (city)"
       }
     ],
+    "san mateo": [
+      {
+        "id": "samtrans",
+        "url": "https://www.samtrans.com/Assets/GTFS/samtrans/ST-GTFS.zip",
+        "label": "SamTrans"
+      },
+      {
+        "id": "caltrain",
+        "url": "https://data.trilliumtransit.com/gtfs/caltrain-ca-us/caltrain-ca-us.zip",
+        "label": "Caltrain"
+      },
+      {
+        "id": "bart_sm",
+        "url": "https://www.bart.gov/dev/schedules/google_transit.zip",
+        "label": "BART"
+      },
+      {
+        "id": "commute",
+        "url": "https://data.trilliumtransit.com/gtfs/commute-ca-us/commute-ca-us.zip",
+        "label": "Commute.org shuttles"
+      }
+    ],
     "santa barbara": [
       {
         "id": "sbmtd",
         "url": "https://www.sbmtd.gov/google_transit/feed.zip",
         "label": "Santa Barbara MTD"
+      }
+    ],
+    "santa clara": [
+      {
+        "id": "vta",
+        "url": "https://gtfs.vta.org/gtfs_vta.zip",
+        "label": "VTA"
+      },
+      {
+        "id": "caltrain_sc",
+        "url": "https://data.trilliumtransit.com/gtfs/caltrain-ca-us/caltrain-ca-us.zip",
+        "label": "Caltrain"
+      },
+      {
+        "id": "mvgo",
+        "url": "https://gtfs.mvgo.org/gtfs.zip",
+        "label": "MVgo (Mountain View TMA)"
+      },
+      {
+        "id": "mvshuttle",
+        "url": "https://gtfs.mvcommunityshuttle.com/gtfs.zip",
+        "label": "Mountain View Community Shuttle"
+      }
+    ],
+    "santa cruz": [
+      {
+        "id": "scmetro",
+        "url": "https://developer.scmetro.org/gtfs.zip",
+        "label": "Santa Cruz METRO"
+      }
+    ],
+    "shasta": [
+      {
+        "id": "raba",
+        "url": "https://gtfs.remix.com/redding_area_bus_authority.zip",
+        "label": "Redding Area Bus Authority"
+      }
+    ],
+    "siskiyou": [
+      {
+        "id": "stage",
+        "url": "https://data.trilliumtransit.com/gtfs/siskiyou-ca-us/siskiyou-ca-us.zip",
+        "label": "Siskiyou STAGE"
+      }
+    ],
+    "solano": [
+      {
+        "id": "soltrans",
+        "url": "https://soltrans.connexionz.net/rtt/public/resource/gtfs.zip",
+        "label": "SolTrans (Vallejo/Benicia)"
+      }
+    ],
+    "sonoma": [
+      {
+        "id": "sct",
+        "url": "https://data.trilliumtransit.com/gtfs/sonomacounty-ca-us/sonomacounty-ca-us.zip",
+        "label": "Sonoma County Transit"
+      },
+      {
+        "id": "santarosa",
+        "url": "https://santarosa.syncromatics.com/gtfs",
+        "label": "Santa Rosa CityBus"
+      },
+      {
+        "id": "smart",
+        "url": "https://data.trilliumtransit.com/gtfs/smart-ca-us/smart-ca-us.zip",
+        "label": "SMART (Sonoma-Marin Area Rail Transit)"
+      }
+    ],
+    "stanislaus": [
+      {
+        "id": "stanrta",
+        "url": "https://stanrta.rideralerts.com/InfoPoint/gtfs-zip.ashx",
+        "label": "Stanislaus Regional Transit Authority"
+      },
+      {
+        "id": "turlock",
+        "url": "https://data.trilliumtransit.com/gtfs/turlock-ca-us/turlock-ca-us.zip",
+        "label": "Turlock Transit"
+      }
+    ],
+    "sutter": [
+      {
+        "id": "yubasutter",
+        "url": "https://data.trilliumtransit.com/gtfs/yubasutter-ca-us/yubasutter-ca-us.zip",
+        "label": "Yuba-Sutter Transit"
+      }
+    ],
+    "trinity": [
+      {
+        "id": "trinity",
+        "url": "https://gtfs.remix.com/trinity_county_ca.zip",
+        "label": "Trinity Transit"
+      }
+    ],
+    "tulare": [
+      {
+        "id": "tcat",
+        "url": "https://data.trilliumtransit.com/gtfs/tcrta-ca-us/tcrta-ca-us.zip",
+        "label": "Tulare County Area Transit (TCRTA)"
+      },
+      {
+        "id": "visalia",
+        "url": "https://data.trilliumtransit.com/gtfs/visalia-ca-us/visalia-ca-us.zip",
+        "label": "Visalia Transit"
+      }
+    ],
+    "tuolumne": [
+      {
+        "id": "tuolumne",
+        "url": "https://gtfs.remix.com/tuolumne_ca_us.zip",
+        "label": "Tuolumne County Transit"
       }
     ],
     "ventura": [
@@ -131,7 +572,27 @@
         "url": "https://govcbus.com/gtfs",
         "label": "Ventura County (combined GTFS)"
       }
+    ],
+    "yolo": [
+      {
+        "id": "yolobus",
+        "url": "https://avl.yctd.org/realtime/google_transit.zip",
+        "label": "Yolobus"
+      },
+      {
+        "id": "unitrans",
+        "url": "https://unitrans.ucdavis.edu/media/gtfs/Unitrans_GTFS.zip",
+        "label": "Unitrans (Davis)"
+      }
+    ],
+    "yuba": [
+      {
+        "id": "yubasutter_yuba",
+        "url": "https://data.trilliumtransit.com/gtfs/yubasutter-ca-us/yubasutter-ca-us.zip",
+        "label": "Yuba-Sutter Transit"
+      }
     ]
   },
-  "_mirrorNote": "MTS is served from the Mobility Database mirror because sdmts.com refuses connections from non-browser clients (verified 2026-08-29, same failure class as FEMA). The mirror was checked for currency before wiring \u2014 service window and feed_version both current \u2014 and the feed-vintage machinery will flag it if the mirror ever falls behind."
+  "_mirrorNote": "MTS is served from the Mobility Database mirror because sdmts.com refuses connections from non-browser clients (verified 2026-08-29, same failure class as FEMA). The mirror was checked for currency before wiring \u2014 service window and feed_version both current \u2014 and the feed-vintage machinery will flag it if the mirror ever falls behind.",
+  "_sharedFeedNote": "BART, Caltrain and Eastern Sierra Transit cross county lines. The engine reads feeds per county and requires unique ids, so the same URL is registered once per county it serves (bart / bart_cc / bart_sm, caltrain / caltrain_sf / caltrain_sc, easternsierra / easternsierra_mono). The nightly pipeline downloads each registration separately; the files are under 1 MB."
 }
