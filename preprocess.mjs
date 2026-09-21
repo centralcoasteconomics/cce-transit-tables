@@ -297,6 +297,30 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   // reported but still published, because real service changes do happen.
   const prevPath = `tables/${county}.json`
   const prev = existsSync(prevPath) ? readTable(prevPath) : null
+
+  // FEED-DROPOUT GUARD (2026-09-21). The collapse guard measures the COUNTY; a county
+  // with several operators can lose one of them whole and still clear it. Sacramento
+  // showed the shape: SacRT's iportal certificate expired and e-tran (446 stops, all of
+  // Elk Grove) plus SCT Link failed together — a 15% dip, inside the WARN band, so the
+  // table would have published with an entire city missing and every Elk Grove run
+  // reporting "no transit" with confidence. Rule: a feed that contributed last night and
+  // is still registered must contribute tonight, or the previous table is held and the
+  // run goes red. Self-healing by design — retiring an operator means removing it from
+  // transitFeeds.json, after which it is no longer "still registered" and the hold lifts.
+  if (prev && Array.isArray(prev.feeds) && prev.feeds.length) {
+    const dropped = feeds
+      .map((f) => f.label)
+      .filter((label) => prev.feeds.includes(label) && !labels.includes(label))
+    if (dropped.length) {
+      console.error(
+        `  ${county}: ${dropped.length} feed(s) that contributed last night failed tonight (${dropped.join('; ')}) — refusing to publish, keeping the previous table`
+      )
+      summary.push(`${county}: HELD (${labels.length}/${feeds.length} feeds; dropped: ${dropped.join('; ')})`)
+      failures.push(`${county}: feed dropout — ${dropped.join('; ')}`)
+      continue
+    }
+  }
+
   if (prev && prev.stops.length > 0) {
     const ratio = stops.length / prev.stops.length
     if (ratio < RETAIN_THRESHOLD) {
