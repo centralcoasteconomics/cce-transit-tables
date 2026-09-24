@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Miter Corner Cam Jig — Template</title>
+<style>
+  @page { size: 8.5in 11in; margin: 0; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Liberation Sans", "DejaVu Sans", Arial, sans-serif; color: #111; }
+  .page { width: 8.5in; height: 11in; position: relative; overflow: hidden; page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  svg { position: absolute; left: 0; top: 0; width: 8.5in; height: 11in; }
+  text { fill: #111; }
+  .cut { fill: none; stroke: #000; stroke-width: 0.018; }
+  .thin { fill: none; stroke: #000; stroke-width: 0.008; }
+  .dash { fill: none; stroke: #000; stroke-width: 0.01; stroke-dasharray: 0.08 0.05; }
+  .grip { fill: none; stroke: #b3261e; stroke-width: 0.06; stroke-dasharray: 0.12 0.06; }
+  .fence { fill: url(#hatch); stroke: #000; stroke-width: 0.018; }
+  .stock { fill: #f1e2cf; stroke: #6b4a2b; stroke-width: 0.014; }
+  .ghost { fill: none; stroke: #777; stroke-width: 0.012; stroke-dasharray: 0.06 0.04; }
+  .h1 { font-size: 0.26px; font-weight: 700; }
+  .h2 { font-size: 0.17px; font-weight: 700; }
+  .t  { font-size: 0.12px; }
+  .s  { font-size: 0.095px; }
+  .red { fill: #b3261e; }
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1: CALIBRATION + CAMS (1:1) ============ -->
+<div class="page">
+<svg viewBox="0 0 8.5 11" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path id="cam" d="M 0.5 -1.4948 L 0.5 -4.0 A 0.5 0.5 0 0 0 -0.5 -4.0 L -0.5 -1.2184 A 1.5 1.5 0 1 0 0.5 -1.4948 Z"/>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="0.18" markerHeight="0.18" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#000"/>
+    </marker>
+  </defs>
+
+  <text x="0.6" y="0.85" class="h1">MITER CORNER CAM JIG — SHEET 1 of 3</text>
+  <text x="0.6" y="1.08" class="t">Print at 100% / “Actual size” (no “fit to page”). Check the square below before cutting.</text>
+
+  <!-- calibration -->
+  <rect x="0.6" y="1.35" width="1" height="1" class="cut"/>
+  <text x="1.75" y="1.6" class="t" font-weight="700">CALIBRATION: this square must measure exactly 1&quot; × 1&quot;</text>
+  <text x="1.75" y="1.8" class="s">and the bar below exactly 4&quot;. If not, reprint with scaling off.</text>
+  <g>
+    <line x1="1.75" y1="2.15" x2="5.75" y2="2.15" class="thin"/>
+    <line x1="1.75" y1="2.0" x2="1.75" y2="2.3" class="thin"/>
+    <line x1="2.75" y1="2.07" x2="2.75" y2="2.23" class="thin"/>
+    <line x1="3.75" y1="2.0" x2="3.75" y2="2.3" class="thin"/>
+    <line x1="4.75" y1="2.07" x2="4.75" y2="2.23" class="thin"/>
+    <line x1="5.75" y1="2.0" x2="5.75" y2="2.3" class="thin"/>
+    <text x="1.72" y="2.45" class="s">0</text><text x="3.72" y="2.45" class="s">2</text><text x="5.72" y="2.45" class="s">4 in</text>
+  </g>
+
+  <!-- CAM 1 -->
+  <g transform="translate(2.1,7.9)">
+    <use href="#cam" class="cut"/>
+    <path d="M -1.125 0 A 1.5 1.5 0 0 0 1.875 0" class="grip" transform="translate(0.375,0) scale(1.04) translate(-0.375,0)"/>
+    <circle cx="0" cy="0" r="0.125" class="cut"/>
+    <line x1="-0.2" y1="0" x2="0.2" y2="0" class="thin"/><line x1="0" y1="-0.2" x2="0" y2="0.2" class="thin"/>
+    <line x1="0.3" y1="0" x2="0.45" y2="0" class="thin"/><line x1="0.375" y1="-0.075" x2="0.375" y2="0.075" class="thin"/>
+    <text x="0" y="0.42" class="s" text-anchor="middle">PIVOT ⌀1/4&quot;</text>
+    <text x="0.62" y="-0.12" class="s">disk ctr</text>
+    <text x="0" y="-2.4" class="s" text-anchor="middle" transform="rotate(-90 0 -2.4)">HANDLE</text>
+    <text x="0.38" y="1.85" class="s red" text-anchor="middle">GRIP EDGE — glue 80-grit</text>
+    <path d="M 0.75 -4.35 A 0.9 0.9 0 0 1 1.45 -3.55" class="thin" marker-end="url(#arr)"/>
+    <text x="1.05" y="-4.55" class="s">clamp</text>
+  </g>
+  <text x="2.1" y="10.2" class="h2" text-anchor="middle">CAM A</text>
+
+  <!-- CAM 2 -->
+  <g transform="translate(5.9,7.9)">
+    <use href="#cam" class="cut"/>
+    <path d="M -1.125 0 A 1.5 1.5 0 0 0 1.875 0" class="grip" transform="translate(0.375,0) scale(1.04) translate(-0.375,0)"/>
+    <circle cx="0" cy="0" r="0.125" class="cut"/>
+    <line x1="-0.2" y1="0" x2="0.2" y2="0" class="thin"/><line x1="0" y1="-0.2" x2="0" y2="0.2" class="thin"/>
+    <line x1="0.3" y1="0" x2="0.45" y2="0" class="thin"/><line x1="0.375" y1="-0.075" x2="0.375" y2="0.075" class="thin"/>
+    <text x="0" y="0.42" class="s" text-anchor="middle">PIVOT ⌀1/4&quot;</text>
+    <text x="0" y="-2.4" class="s" text-anchor="middle" transform="rotate(-90 0 -2.4)">HANDLE</text>
+    <text x="0.38" y="1.85" class="s red" text-anchor="middle">GRIP EDGE — glue 80-grit</text>
+  </g>
+  <text x="5.9" y="10.2" class="h2" text-anchor="middle">CAM B (install face-down)</text>
+
+  <text x="0.6" y="2.85" class="t" font-weight="700">CAMS — make 2 from 1/2&quot; Baltic birch (or any ply ≥ 1/8&quot; thinner than your frame stock)</text>
+  <text x="0.6" y="3.05" class="s">Disk: R 1-1/2&quot;, pivot offset 3/8&quot; from disk centre → 3/4&quot; of clamping travel.  Handle 1&quot; wide.  Solid line = cut, circle = drill.</text>
+  <text x="0.6" y="3.22" class="s">Cam B is the same part flipped over (mirror image) so both cams pull their piece TOWARD the corner.</text>
+
+  <text x="0.6" y="10.6" class="s">Tip: spray-mount this sheet to the ply, drill the pivot holes first, then bandsaw/jigsaw just outside the line and sand to it.</text>
+</svg>
+</div>
+
+<!-- ============ PAGE 2: FULL-SIZE CORNER LAYOUT (1:1) ============ -->
+<div class="page">
+<svg viewBox="0 0 8.5 11" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="hatch" width="0.12" height="0.12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="0.12" height="0.12" fill="#fff"/>
+      <line x1="0" y1="0" x2="0" y2="0.12" stroke="#999" stroke-width="0.02"/>
+    </pattern>
+  </defs>
+  <text x="0.6" y="0.85" class="h1">SHEET 2 of 3 — FULL-SIZE CORNER LAYOUT (1:1)</text>
+  <text x="0.6" y="1.08" class="t">Tape to the base with the two “base edge” lines on the base edges. Set fences to the hatched areas;</text>
+  <text x="0.6" y="1.26" class="t">check with a framing square. Drill the relief hole after the fences are on.</text>
+
+  <!-- stock pieces (shown at 1-3/4" wide) -->
+  <polygon points="2.25,8.75 7.75,8.75 7.75,7.0 4.0,7.0" class="stock"/>
+  <polygon points="2.25,8.75 2.25,2.4 4.0,2.4 4.0,7.0" class="stock"/>
+  <line x1="2.25" y1="8.75" x2="4.0" y2="7.0" stroke="#6b4a2b" stroke-width="0.03"/>
+  <text x="5.8" y="7.95" class="t" text-anchor="middle" fill="#6b4a2b">FRAME PIECE A (drawn 1-3/4&quot; wide)</text>
+  <text x="3.12" y="4.7" class="t" text-anchor="middle" transform="rotate(-90 3.12 4.7)">FRAME PIECE B</text>
+  <text x="3.35" y="7.55" class="s" transform="rotate(-45 3.35 7.55)">MITER</text>
+
+  <!-- fences -->
+  <rect x="0.75" y="2.4" width="1.5" height="6.35" class="fence"/>
+  <rect x="0.75" y="8.75" width="7.0" height="1.5" class="fence"/>
+  <text x="1.5" y="5.6" class="t" text-anchor="middle" transform="rotate(-90 1.5 5.6)" font-weight="700">FENCE B  1-1/2&quot; wide</text>
+  <text x="5.0" y="9.55" class="t" text-anchor="middle" font-weight="700">FENCE A  1-1/2&quot; wide</text>
+
+  <!-- reference faces -->
+  <line x1="2.25" y1="2.4" x2="2.25" y2="10.25" class="cut"/>
+  <line x1="0.75" y1="8.75" x2="7.75" y2="8.75" class="cut"/>
+
+  <!-- base edges -->
+  <line x1="0.75" y1="2.2" x2="0.75" y2="10.5" class="dash"/>
+  <line x1="0.5" y1="10.25" x2="7.95" y2="10.25" class="dash"/>
+  <text x="0.62" y="6.0" class="s" text-anchor="middle" transform="rotate(-90 0.62 6.0)">BASE EDGE</text>
+  <text x="7.0" y="10.45" class="s">BASE EDGE</text>
+
+  <!-- relief hole -->
+  <circle cx="2.25" cy="8.75" r="0.125" class="cut"/>
+  <line x1="2.05" y1="8.75" x2="2.45" y2="8.75" class="thin"/>
+  <line x1="2.25" y1="8.55" x2="2.25" y2="8.95" class="thin"/>
+  <line x1="2.35" y1="8.85" x2="2.9" y2="9.2" class="thin"/>
+  <text x="2.95" y="9.25" class="s">RELIEF HOLE ⌀1/4&quot; — drill through fences &amp; base</text>
+
+  <!-- bisector -->
+  <line x1="2.25" y1="8.75" x2="7.2" y2="3.8" class="ghost"/>
+  <text x="6.4" y="4.4" class="s" fill="#555" transform="rotate(-45 6.4 4.4)">45° bisector</text>
+
+  <!-- 90 deg tick -->
+  <path d="M 2.25 8.25 L 2.75 8.25 L 2.75 8.75" class="thin"/>
+  <text x="2.8" y="8.2" class="s">90°</text>
+</svg>
+</div>
+
+<!-- ============ PAGE 3: PLAN VIEW + DIMENSIONS ============ -->
+<div class="page">
+<svg viewBox="0 0 8.5 11" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="hatch3" width="0.3" height="0.3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="0.3" height="0.3" fill="#fff"/>
+      <line x1="0" y1="0" x2="0" y2="0.3" stroke="#999" stroke-width="0.05"/>
+    </pattern>
+    <marker id="d" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="0.35" markerHeight="0.35" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M0,1 L10,5 L0,9 z" fill="#000"/>
+    </marker>
+    <path id="cam3" d="M 0.5 -1.4948 L 0.5 -4.0 A 0.5 0.5 0 0 0 -0.5 -4.0 L -0.5 -1.2184 A 1.5 1.5 0 1 0 0.5 -1.4948 Z"/>
+  </defs>
+  <text x="0.6" y="0.85" class="h1">SHEET 3 of 3 — PLAN VIEW &amp; CUT LIST</text>
+  <text x="0.6" y="1.08" class="t">NOT TO SCALE — use the dimensions. Stock shown at 1-3/4&quot; wide; cam pivots are located by dry-fit (step 4).</text>
+
+  <!-- drawing in real inches, scaled 0.36 -->
+  <g transform="translate(1.0,2.35) scale(0.36)">
+    <!-- base -->
+    <rect x="0" y="0" width="14" height="14" fill="#faf7f2" stroke="#000" stroke-width="0.05"/>
+    <!-- stock -->
+    <polygon points="1.5,12.5 16.5,12.5 16.5,10.75 3.25,10.75" class="stock" stroke-width="0.04"/>
+    <polygon points="1.5,12.5 1.5,-1.5 3.25,-1.5 3.25,10.75" class="stock" stroke-width="0.04"/>
+    <line x1="1.5" y1="12.5" x2="3.25" y2="10.75" stroke="#6b4a2b" stroke-width="0.08"/>
+    <!-- fences -->
+    <rect x="0" y="0" width="1.5" height="12.5" fill="url(#hatch3)" stroke="#000" stroke-width="0.05"/>
+    <rect x="0" y="12.5" width="14" height="1.5" fill="url(#hatch3)" stroke="#000" stroke-width="0.05"/>
+    <circle cx="1.5" cy="12.5" r="0.2" fill="#fff" stroke="#000" stroke-width="0.05"/>
+    <!-- cam A clamped (handle pointing away from corner) + start ghost -->
+    <g transform="translate(9,8.875) rotate(90)"><use href="#cam3" fill="#e8eef7" stroke="#1f4e8c" stroke-width="0.06"/><circle r="0.15" fill="#1f4e8c"/></g>
+    <g transform="translate(9,8.875) rotate(-90)" opacity="0.8"><use href="#cam3" fill="none" stroke="#1f4e8c" stroke-width="0.04" stroke-dasharray="0.2 0.12"/></g>
+    <path d="M 6.4 7.375 A 3 3 0 0 1 11.6 7.375" fill="none" stroke="#1f4e8c" stroke-width="0.05" marker-end="url(#d)"/>
+    <!-- cam B clamped (mirror) + start ghost -->
+    <g transform="translate(5.125,5) scale(-1,1)"><use href="#cam3" fill="#e8eef7" stroke="#1f4e8c" stroke-width="0.06"/><circle r="0.15" fill="#1f4e8c"/></g>
+
+    <!-- labels -->
+    <text x="9.3" y="12.0" font-size="0.42">PIECE A</text>
+    <text x="2.55" y="4.0" font-size="0.42" transform="rotate(-90 2.55 4.0)">PIECE B</text>
+    <text x="7.5" y="13.45" font-size="0.42">FENCE A</text>
+    <text x="0.9" y="8.2" font-size="0.42" transform="rotate(-90 0.9 8.2)">FENCE B</text>
+    <text x="10.9" y="10.35" font-size="0.42" fill="#1f4e8c">CAM A</text>
+    <text x="6.3" y="3.0" font-size="0.42" fill="#1f4e8c">CAM B (flipped)</text>
+    <text x="3.7" y="10.3" font-size="0.34" fill="#1f4e8c">dashed = start position</text>
+    <text x="1.9" y="13.35" font-size="0.34">relief hole</text>
+
+    <!-- dims -->
+    <line x1="0" y1="15.0" x2="14" y2="15.0" stroke="#000" stroke-width="0.04" marker-start="url(#d)" marker-end="url(#d)"/>
+    <text x="7" y="15.6" font-size="0.42" text-anchor="middle">14&quot; base</text>
+    <line x1="15.0" y1="0" x2="15.0" y2="14" stroke="#000" stroke-width="0.04" marker-start="url(#d)" marker-end="url(#d)"/>
+    <text x="15.6" y="7" font-size="0.42" text-anchor="middle" transform="rotate(90 15.6 7)">14&quot; base</text>
+    <line x1="1.5" y1="-2.2" x2="9" y2="-2.2" stroke="#000" stroke-width="0.04" marker-start="url(#d)" marker-end="url(#d)"/>
+    <line x1="9" y1="-2.5" x2="9" y2="8.875" stroke="#000" stroke-width="0.02" stroke-dasharray="0.15 0.1"/>
+    <text x="5.25" y="-2.45" font-size="0.4" text-anchor="middle">7-1/2&quot; ref. face → cam A pivot</text>
+    <line x1="-1.0" y1="12.5" x2="-1.0" y2="5" stroke="#000" stroke-width="0.04" marker-start="url(#d)" marker-end="url(#d)"/>
+    <line x1="-1.3" y1="5" x2="5.125" y2="5" stroke="#000" stroke-width="0.02" stroke-dasharray="0.15 0.1"/>
+    <text x="-1.35" y="8.75" font-size="0.4" text-anchor="middle" transform="rotate(-90 -1.35 8.75)">7-1/2&quot; → cam B pivot</text>
+  </g>
+
+  <!-- cut list -->
+  <g transform="translate(0.6,8.2)">
+    <text class="h2">CUT LIST</text>
+    <text y="0.25" class="s">Base ............ 1   3/4&quot; plywood           14&quot; × 14&quot;  (check it is flat)</text>
+    <text y="0.42" class="s">Fence A ......... 1   hardwood/ply strip     1-1/2&quot; × 14&quot;, height ≤ frame thickness</text>
+    <text y="0.59" class="s">Fence B ......... 1   hardwood/ply strip     1-1/2&quot; × 12-1/2&quot;, same height</text>
+    <text y="0.76" class="s">Cam ............. 2   1/2&quot; Baltic birch       from Sheet 1</text>
+    <text y="0.93" class="s">Hardware ........ 2 × #10 × 1-1/4&quot; pan-head screws + 2 fender washers (cam pivots); 8 × #8 × 1-1/4&quot; screws + glue (fences);</text>
+    <text y="1.10" class="s">                  80-grit PSA sandpaper strip (cam grip edges); paste wax (fence faces).</text>
+    <text y="1.40" class="h2">IF A PLYWOOD GUSSET IS ALREADY ON THE UNDERSIDE</text>
+    <text y="1.62" class="s">Dry-fit a corner on the base, trace the gusset, and cut that pocket out of the base (jigsaw) so the frame lies flat on the base.</text>
+    <text y="1.79" class="s">The cams bear on the frame edges above the pocket, so they still work.</text>
+    <text y="2.25" class="s" fill="#555">Sheet 3 of 3 · mitered-corner clamping jig for mending-plate layout</text>
+  </g>
+</svg>
+</div>
+
+</body>
+</html>
