@@ -240,6 +240,41 @@ async function processFeed(feed) {
   return { refDate, stops: out }
 }
 
+// EXPECTED-OUTAGE REGISTER (2026-09-25). The guards below are correct and must never be
+// weakened: a held table always beats a partial one. But a guard that cannot tell "the
+// outage we already know about" from "something new broke tonight" goes red every night
+// and stops being read — Sacramento had been red five nights running when this was
+// written, and a second county failing would have looked exactly the same in the run list.
+// An entry NEVER publishes anything and NEVER lifts a hold. It only records that a human
+// has already seen this failure, so the exit code can stay green while the table stays
+// held. Every entry carries a reviewBy date and STOPS COUNTING the day after it, because a
+// suppression that never expires is how a county goes missing for a year.
+const EXPECTED_OUTAGES = Object.fromEntries(
+  Object.entries(registry._expectedOutages ?? {})
+    .filter(([k]) => !k.startsWith('_'))
+    .map(([k, v]) => [k.replace(/\s+/g, '-'), v])
+)
+
+/**
+ * The acknowledgement covering this feed's failure, or null if it is unexpected — or if
+ * its acknowledgement has lapsed, which is deliberately loud: a stale entry must turn the
+ * run red again rather than keep hiding a county nobody has looked at in weeks.
+ */
+function acknowledgedOutage(county, feed, today) {
+  const entry = EXPECTED_OUTAGES[`${county}/${feed.id}`]
+  if (!entry) return null
+  const reviewBy = (entry.reviewBy ?? '').replace(/-/g, '')
+  if (!reviewBy || reviewBy < today) {
+    console.error(
+      `  ${feed.id}: the acknowledgement for this outage ${
+        reviewBy ? `lapsed on ${entry.reviewBy}` : 'carries no reviewBy date'
+      } — treating it as a NEW failure`
+    )
+    return null
+  }
+  return entry
+}
+
 /** Below this share of the previous run's stop count, keep the old table and shout. */
 const RETAIN_THRESHOLD = 0.5
 /** Below this share, publish but say so — real service changes look like this. */
@@ -257,6 +292,10 @@ function readTable(path) {
 mkdirSync('tables', { recursive: true })
 const summary = []
 const failures = []
+// Held counties whose every failing feed is covered by an unexpired acknowledgement.
+// Reported loudly, but they do not turn the run red.
+const acknowledged = []
+const TODAY = ymd(new Date())
 // ONLY=monterey,riverside limits a local run to named counties (verification only; the
 // nightly job never sets it, so it always builds every table).
 const only = (process.env.ONLY ?? '').split(',').map((s) => s.trim()).filter(Boolean)
@@ -265,6 +304,7 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   console.log(`${county}:`)
   const stops = []
   const labels = []
+  const failedFeeds = []
   let refDate = 'none'
   for (const feed of feeds) {
     try {
@@ -274,8 +314,15 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
       if (r.refDate !== 'none') refDate = r.refDate
     } catch (e) {
       console.error(`  ${feed.id}: FAILED — ${e.message} (keeping previous table's data absent for this feed)`)
+      failedFeeds.push(feed)
     }
   }
+  // Classify once, before either guard fires: a county is "excused" only when at least one
+  // feed failed AND every one of those failures is covered by an unexpired entry. The hold
+  // itself is unaffected either way — this decides the exit code, nothing else.
+  const unexpected = failedFeeds.filter((f) => !acknowledgedOutage(county, f, TODAY))
+  const excused = failedFeeds.length > 0 && unexpected.length === 0
+  const note = excused ? ' — KNOWN OUTAGE, already acknowledged' : ''
   // A county whose every feed failed must NOT get an empty table published. The Worker
   // treats a table it can fetch as authoritative, so `{"stops":[]}` would state "no
   // transit here" with confidence — a false negative that silently caps TCAC transit
@@ -283,8 +330,8 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   // answer. Leaving the previous night's table in place is better still.
   if (stops.length === 0) {
     console.error(`  ${county}: no stops from any feed — leaving the existing table untouched`)
-    summary.push(`${county}: SKIPPED (0 stops, ${labels.length}/${feeds.length} feeds)`)
-    failures.push(`${county}: 0 stops from ${feeds.length} feed(s)`)
+    summary.push(`${county}: SKIPPED (0 stops, ${labels.length}/${feeds.length} feeds)${note}`)
+    ;(excused ? acknowledged : failures).push(`${county}: 0 stops from ${feeds.length} feed(s)`)
     continue
   }
 
@@ -315,8 +362,8 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
       console.error(
         `  ${county}: ${dropped.length} feed(s) that contributed last night failed tonight (${dropped.join('; ')}) — refusing to publish, keeping the previous table`
       )
-      summary.push(`${county}: HELD (${labels.length}/${feeds.length} feeds; dropped: ${dropped.join('; ')})`)
-      failures.push(`${county}: feed dropout — ${dropped.join('; ')}`)
+      summary.push(`${county}: HELD (${labels.length}/${feeds.length} feeds; dropped: ${dropped.join('; ')})${note}`)
+      ;(excused ? acknowledged : failures).push(`${county}: feed dropout — ${dropped.join('; ')}`)
       continue
     }
   }
@@ -344,6 +391,19 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   summary.push(`${county}: ${stops.length} stops${delta}, ${labels.length}/${feeds.length} feeds`)
 }
 console.log('\n' + summary.join('\n'))
+
+// A county held on an outage somebody has already written down and dated. Still held,
+// still reported, but it does not turn the run red — so a red run keeps meaning "something
+// changed tonight", which is the only thing that makes it worth reading.
+if (acknowledged.length) {
+  console.warn(`\n${acknowledged.length} county/counties held on a KNOWN outage (not a new fault):`)
+  for (const a of acknowledged) {
+    const county = a.split(':')[0]
+    const entries = Object.entries(EXPECTED_OUTAGES).filter(([k]) => k.startsWith(`${county}/`))
+    const until = entries.map(([, v]) => v.reviewBy).filter(Boolean).sort()[0]
+    console.warn(`  - ${a}${until ? ` (acknowledged through ${until})` : ''}`)
+  }
+}
 
 // Exit non-zero so the nightly GitHub Action goes red. A pipeline that fails silently and
 // commits a degraded table is exactly how Orange County sat at zero stops unnoticed.

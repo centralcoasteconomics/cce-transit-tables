@@ -1,5 +1,23 @@
 {
   "_doc": "Single source of truth for county GTFS feeds. BOTH consumers read this file: the app (connectors/transit/feeds.ts) and the nightly pipeline (cce-transit-tables/preprocess.mjs). Keys are canonical lowercase-with-spaces; each consumer normalizes as it needs. These previously lived in two hand-synced registries with different key styles, so a drift surfaced as the Mac and the edge disagreeing about a site's transit \u2014 the hardest kind of bug to notice.",
+  "_expectedOutages": {
+    "_doc": "Acknowledged upstream outages. An entry NEVER publishes data and NEVER lifts a hold: the county's previous table is still held, exactly as the feed-dropout and collapse guards decide. It only records that a human has already seen this failure, so the nightly run's exit code can stay green while the table stays held \u2014 a guard that cannot tell a known outage from a new one goes red forever and stops being read. Key is '<county>/<feedId>'. Every entry MUST carry a reviewBy date and stops counting the day after it, because a suppression that never expires is how a county goes missing for a year. Delete an entry the moment the feed recovers; to retire an operator for good, remove it from counties[] instead, which lifts the hold by itself.",
+    "sacramento/etran": {
+      "reason": "SacRT wildcard cert on iportal.sacrt.com expired 2026-09-20 23:59 UTC and the operator has not renewed. Fails identically from every client; nothing to fix on our side and never swap in a stale mirror (trap #18).",
+      "since": "2026-09-21",
+      "reviewBy": "2026-10-11"
+    },
+    "sacramento/sctlink": {
+      "reason": "Same expired iportal.sacrt.com cert as sacramento/etran.",
+      "since": "2026-09-21",
+      "reviewBy": "2026-10-11"
+    },
+    "sacramento/sacrt": {
+      "reason": "PRE-REGISTERED 2026-09-25: the separate *.sacrt.com cert on apps.sacrt.com expires tonight, 2026-09-25 23:59 UTC, and SacRT has left the iportal cert expired for five days. If it lapses, all three Sacramento feeds fail and the county takes the zero-stops path. If it is renewed, this entry is inert \u2014 it is only ever consulted on failure.",
+      "since": "2026-09-25",
+      "reviewBy": "2026-10-11"
+    }
+  },
   "notWired": {
     "imperial": "No published GTFS feed found in the Mobility Database catalog.",
     "alameda": "AC Transit \u2014 the county's primary operator \u2014 publishes GTFS only through api.actransit.org (401 without a token) and 511.org (API key); its open-data zips are archived snapshots whose last (Aug 2025) calendar ended 2025-12-06. Wiring BART, Emery Go-Round and LAVTA without it would report Oakland/Berkeley/Hayward bus sites as unserved. Verified 2026-09-15.",
