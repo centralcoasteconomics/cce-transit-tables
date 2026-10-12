@@ -3,19 +3,24 @@
   "_expectedOutages": {
     "_doc": "Acknowledged upstream outages. An entry NEVER publishes data and NEVER lifts a hold: the county's previous table is still held, exactly as the feed-dropout and collapse guards decide. It only records that a human has already seen this failure, so the nightly run's exit code can stay green while the table stays held \u2014 a guard that cannot tell a known outage from a new one goes red forever and stops being read. Key is '<county>/<feedId>'. Every entry MUST carry a reviewBy date and stops counting the day after it, because a suppression that never expires is how a county goes missing for a year. Delete an entry the moment the feed recovers; to retire an operator for good, remove it from counties[] instead, which lifts the hold by itself.",
     "sacramento/etran": {
-      "reason": "SacRT wildcard cert on iportal.sacrt.com expired 2026-09-20 23:59 UTC and the operator has not renewed. Fails identically from every client; nothing to fix on our side and never swap in a stale mirror (trap #18).",
+      "reason": "SacRT wildcard cert on iportal.sacrt.com expired 2026-09-20 23:59 UTC and the operator has not renewed. RE-VERIFIED LIVE 2026-10-12 by the weekly steward: the handshake still presents CN=*.sacrt.com, notAfter Sep 20 23:59:59 2026 GMT, and curl exits 60 from this Mac. Fails identically from every client; nothing to fix on our side and never swap in a stale mirror (trap #18). Sacramento's table has now been held 21 days: if it is still held at the next review this stops being a register entry and becomes a coverage statement for Ryan to decide.",
       "since": "2026-09-21",
-      "reviewBy": "2026-10-11"
+      "reviewBy": "2026-10-26"
     },
     "sacramento/sctlink": {
-      "reason": "Same expired iportal.sacrt.com cert as sacramento/etran.",
+      "reason": "Same expired iportal.sacrt.com cert as sacramento/etran. Re-verified live 2026-10-12.",
       "since": "2026-09-21",
-      "reviewBy": "2026-10-11"
+      "reviewBy": "2026-10-26"
     },
     "sacramento/sacrt": {
-      "reason": "PRE-REGISTERED 2026-09-25: the separate *.sacrt.com cert on apps.sacrt.com expires tonight, 2026-09-25 23:59 UTC, and SacRT has left the iportal cert expired for five days. If it lapses, all three Sacramento feeds fail and the county takes the zero-stops path. If it is renewed, this entry is inert \u2014 it is only ever consulted on failure.",
+      "reason": "The separate *.sacrt.com cert on apps.sacrt.com expired 2026-09-25 23:59 UTC, so all three Sacramento feeds fail and the county takes the zero-stops path. RE-VERIFIED LIVE 2026-10-12: notAfter Sep 25 23:59:59 2026 GMT, curl exit 60. Held with etran and sctlink.",
       "since": "2026-09-25",
-      "reviewBy": "2026-10-11"
+      "reviewBy": "2026-10-26"
+    },
+    "fresno/fax": {
+      "reason": "gis4u.fresno.gov resets the TLS connection before the handshake completes. DIAGNOSED LIVE 2026-10-12 by the weekly steward across three independent TLS stacks, 8 consecutive attempts, zero successes: macOS LibreSSL (SSL_ERROR_SYSCALL), Python/OpenSSL (UNEXPECTED_EOF_WHILE_READING) and Node/undici (ECONNRESET), the same ECONNRESET the 2026-10-11 nightly saw. TCP 443 accepts the connection, so this is server-side, not DNS and not a cert. The feed was green on the 10/09 and 10/10 nightlies, so the outage began within the last 24 h; FAX also dropped once on 10/02 and self-healed, so SHORT review on purpose: delete this entry the moment a nightly comes back with FAX in it.",
+      "since": "2026-10-12",
+      "reviewBy": "2026-10-19"
     }
   },
   "notWired": {
