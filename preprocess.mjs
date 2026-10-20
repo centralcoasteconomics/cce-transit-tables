@@ -416,6 +416,15 @@ console.log('\n' + summary.join('\n'))
 if (!only.length) {
   mkdirSync('state', { recursive: true })
   writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 1) + '\n')
+  // FRESHNESS PER COUNTY (2026-10-19). A green run says nothing about a county whose table has been
+  // HELD for a week (a dropout, a collapse, or now a flapping feed). Each county's table age goes to
+  // one small file the app's `npm run health` reads, so a held county ages visibly.
+  const index = {}
+  for (const county of Object.keys(COUNTY_FEEDS)) {
+    const t = existsSync(`tables/${county}.json`) ? readTable(`tables/${county}.json`) : null
+    index[county] = t?.generatedAt ?? null
+  }
+  writeFileSync('state/tables-index.json', JSON.stringify({ generatedAt: new Date().toISOString(), counties: index }, null, 1) + '\n')
 }
 
 // Held on a feed that fails some nights and recovers on its own (flap.mjs). Still held, still
