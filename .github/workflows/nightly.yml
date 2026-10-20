@@ -28,7 +28,7 @@ jobs:
         run: |
           git config user.name "cce-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add tables/
+          git add tables/ state/
           git diff --cached --quiet || (git commit -m "tables $(date -u +%F)" && git push)
 
       - name: Fail the run if any county did not publish

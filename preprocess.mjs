@@ -15,6 +15,7 @@ import { readFile } from 'node:fs/promises'
 import { unzipSync, strFromU8 } from 'fflate'
 import { parse } from 'csv-parse/sync'
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs'
+import { recordNight, flapStatus } from './flap.mjs'
 
 const AM_START = 7 * 3600, AM_END = 9 * 3600
 const PM_START = 16 * 3600, PM_END = 18 * 3600
@@ -295,7 +296,14 @@ const failures = []
 // Held counties whose every failing feed is covered by an unexpired acknowledgement.
 // Reported loudly, but they do not turn the run red.
 const acknowledged = []
+// Held counties whose every unacknowledged failing feed is FLAPPING (flap.mjs): a feed that
+// fails some nights and recovers on its own. Held and reported with the rate, but green.
+const flapping = []
 const TODAY = ymd(new Date())
+// Each feed's nightly result, kept in state/ (committed by the nightly job alongside tables/).
+const HISTORY_PATH = 'state/feed-history.json'
+let history = {}
+try { history = JSON.parse(readFileSync(HISTORY_PATH, 'utf8')) } catch { history = {} }
 // ONLY=monterey,riverside limits a local run to named counties (verification only; the
 // nightly job never sets it, so it always builds every table).
 const only = (process.env.ONLY ?? '').split(',').map((s) => s.trim()).filter(Boolean)
@@ -317,12 +325,29 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
       failedFeeds.push(feed)
     }
   }
+  if (!only.length) for (const feed of feeds) recordNight(history, `${county}/${feed.id}`, TODAY, !failedFeeds.includes(feed))
+  const prevPath = `tables/${county}.json`
+  const prev = existsSync(prevPath) ? readTable(prevPath) : null
   // Classify once, before either guard fires: a county is "excused" only when at least one
   // feed failed AND every one of those failures is covered by an unexpired entry. The hold
   // itself is unaffected either way — this decides the exit code, nothing else.
-  const unexpected = failedFeeds.filter((f) => !acknowledgedOutage(county, f, TODAY))
+  const unregistered = failedFeeds.filter((f) => !acknowledgedOutage(county, f, TODAY))
+  // A feed flaps only against an intact previous table that it contributed to, so the table
+  // being held is a whole one. Without that, the failure stays red.
+  const prevIntact = (f) => Boolean(prev && prev.stops.length > 0 && Array.isArray(prev.feeds) && prev.feeds.includes(f.label))
+  const flaps = new Map()
+  for (const f of unregistered) {
+    const st = flapStatus(history, `${county}/${f.id}`, TODAY)
+    if (st.flapping && !prevIntact(f)) st.flapping = false, st.reason = 'the previous table does not hold this feed'
+    flaps.set(f, st)
+    console.warn(`  ${f.id}: ${st.flapping ? 'FLAPPING' : 'not flapping'}: ${st.reason}`)
+  }
+  const unexpected = unregistered.filter((f) => !flaps.get(f)?.flapping)
   const excused = failedFeeds.length > 0 && unexpected.length === 0
-  const note = excused ? ' — KNOWN OUTAGE, already acknowledged' : ''
+  const flapOnly = excused && unregistered.length > 0
+  const flapText = unregistered.map((f) => `${f.id} ${flaps.get(f).failed}/${flaps.get(f).nights} nights failed`).join('; ')
+  const note = !excused ? '' : flapOnly ? ` (FLAPPING: ${flapText})` : ' — KNOWN OUTAGE, already acknowledged'
+  const excusedList = flapOnly ? flapping : acknowledged
   // A county whose every feed failed must NOT get an empty table published. The Worker
   // treats a table it can fetch as authoritative, so `{"stops":[]}` would state "no
   // transit here" with confidence — a false negative that silently caps TCAC transit
@@ -331,7 +356,7 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   if (stops.length === 0) {
     console.error(`  ${county}: no stops from any feed — leaving the existing table untouched`)
     summary.push(`${county}: SKIPPED (0 stops, ${labels.length}/${feeds.length} feeds)${note}`)
-    ;(excused ? acknowledged : failures).push(`${county}: 0 stops from ${feeds.length} feed(s)`)
+    ;(excused ? excusedList : failures).push(`${county}: 0 stops from ${feeds.length} feed(s)${flapOnly ? `; ${flapText}` : ''}`)
     continue
   }
 
@@ -342,9 +367,6 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   // County spent days at zero before a human noticed. Anything below RETAIN_THRESHOLD of
   // last night's count keeps the previous table and reports loudly; a smaller dip is
   // reported but still published, because real service changes do happen.
-  const prevPath = `tables/${county}.json`
-  const prev = existsSync(prevPath) ? readTable(prevPath) : null
-
   // FEED-DROPOUT GUARD (2026-09-21). The collapse guard measures the COUNTY; a county
   // with several operators can lose one of them whole and still clear it. Sacramento
   // showed the shape: SacRT's iportal certificate expired and e-tran (446 stops, all of
@@ -363,7 +385,7 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
         `  ${county}: ${dropped.length} feed(s) that contributed last night failed tonight (${dropped.join('; ')}) — refusing to publish, keeping the previous table`
       )
       summary.push(`${county}: HELD (${labels.length}/${feeds.length} feeds; dropped: ${dropped.join('; ')})${note}`)
-      ;(excused ? acknowledged : failures).push(`${county}: feed dropout — ${dropped.join('; ')}`)
+      ;(excused ? excusedList : failures).push(`${county}: feed dropout — ${dropped.join('; ')}${flapOnly ? `; ${flapText}` : ''}`)
       continue
     }
   }
@@ -391,6 +413,17 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   summary.push(`${county}: ${stops.length} stops${delta}, ${labels.length}/${feeds.length} feeds`)
 }
 console.log('\n' + summary.join('\n'))
+if (!only.length) {
+  mkdirSync('state', { recursive: true })
+  writeFileSync(HISTORY_PATH, JSON.stringify(history, null, 1) + '\n')
+}
+
+// Held on a feed that fails some nights and recovers on its own (flap.mjs). Still held, still
+// reported with its failure count, but green: a red run should mean something new broke.
+if (flapping.length) {
+  console.warn(`\n${flapping.length} county/counties held on a FLAPPING feed (previous table kept; not a new fault):`)
+  for (const f of flapping) console.warn(`  - ${f}`)
+}
 
 // A county held on an outage somebody has already written down and dated. Still held,
 // still reported, but it does not turn the run red — so a red run keeps meaning "something

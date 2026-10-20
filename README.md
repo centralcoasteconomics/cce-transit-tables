@@ -9,3 +9,10 @@ Runs nightly via GitHub Actions; run locally with `npm ci && node preprocess.mjs
 Data: publicly published GTFS from the agencies listed in `transitFeeds.json` (94 feeds
 across 51 California counties as of 2026-09-15; the file is synced from the app's
 `src/shared/transitFeeds.json` and carries the reasons for the 7 counties left unwired).
+
+**Flapping feeds (2026-10-19).** A feed that fails some nights and recovers on its own keeps
+its county's previous table (held, never published partial) but no longer turns the run red,
+when it has 7+ nights of history, has not failed 3 nights in a row, and failed at most half of
+the last 14 nights (`flap.mjs`; per-feed results in `state/feed-history.json`). The rule
+starts counting from the first nightly after deploy, so it takes effect after about a week.
+`npm test` runs its checks.
