@@ -374,5 +374,47 @@
  "yuba/yubasutter_yuba": {
   "20261020": true,
   "20261021": true
+ },
+ "los-angeles/avta": {
+  "20261021": true
+ },
+ "los-angeles/metrolink": {
+  "20261021": true
+ },
+ "los-angeles/lbt": {
+  "20261021": true
+ },
+ "los-angeles/culvercitybus": {
+  "20261021": true
+ },
+ "los-angeles/montebello": {
+  "20261021": true
+ },
+ "los-angeles/norwalk": {
+  "20261021": true
+ },
+ "los-angeles/gtrans": {
+  "20261021": true
+ },
+ "los-angeles/pasadena": {
+  "20261021": true
+ },
+ "los-angeles/santaclarita": {
+  "20261021": true
+ },
+ "orange/metrolink_orange": {
+  "20261021": true
+ },
+ "riverside/metrolink_riverside": {
+  "20261021": true
+ },
+ "san-bernardino/metrolink_sb": {
+  "20261021": true
+ },
+ "san-diego/metrolink_sd": {
+  "20261021": true
+ },
+ "ventura/metrolink_ventura": {
+  "20261021": true
  }
 }
