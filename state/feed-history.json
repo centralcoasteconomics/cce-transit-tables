@@ -1,284 +1,378 @@
 {
  "amador/amador": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "butte/bline": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "calaveras/calaveras": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "contra-costa/countyconnection": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "contra-costa/westcat": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "contra-costa/bart_cc": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "el-dorado/eldorado": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "fresno/fax": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "fresno/fcrta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "fresno/clovis": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "glenn/glenn": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "humboldt/hta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "inyo/easternsierra": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "kern/get": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "kern/kerntransit": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "kern/delano": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "kern/arvin": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "kings/kart": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "lake/laketransit": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "lassen/lassen": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "los-angeles/lametro_bus": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "los-angeles/lametro_rail": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "los-angeles/foothill": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "los-angeles/ladot": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "los-angeles/bigbluebus": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "madera/maderacounty": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "marin/marintransit": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "marin/goldengate": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "mariposa/yarts": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "mendocino/mta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "merced/thebus": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "modoc/sagestage": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "mono/easternsierra_mono": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "monterey/mst": {
-  "20261020": false
+  "20261020": false,
+  "20261021": true
  },
  "napa/vine": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "nevada/nevadacountyconnects": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "orange/octa": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "placer/placercounty": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "placer/tart": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "placer/roseville": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "plumas/plumas": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "riverside/rta": {
-  "20261020": false
+  "20261020": false,
+  "20261021": true
  },
  "riverside/sunline": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "riverside/corona": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "riverside/beaumont": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "riverside/banning": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "sacramento/sacrt": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "sacramento/etran": {
-  "20261020": false
+  "20261020": false,
+  "20261021": false
  },
  "sacramento/sctlink": {
-  "20261020": false
+  "20261020": false,
+  "20261021": false
  },
  "san-benito/sbce": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-bernardino/omnitrans": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-bernardino/vvta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-bernardino/mountaintransit": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-bernardino/morongo": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-diego/mts": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-diego/nctd": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-francisco/sfmta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-francisco/bart": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-francisco/caltrain_sf": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-francisco/weta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-joaquin/sjrtd": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-joaquin/grapeline": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-joaquin/tracer": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-joaquin/mantecatransit": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-joaquin/escalon": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-luis-obispo/slorta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-luis-obispo/slotransit": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-mateo/samtrans": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-mateo/caltrain": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-mateo/bart_sm": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "san-mateo/commute": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "santa-barbara/sbmtd": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "santa-clara/vta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "santa-clara/caltrain_sc": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "santa-clara/mvgo": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "santa-clara/mvshuttle": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "santa-cruz/scmetro": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "shasta/raba": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "siskiyou/stage": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "solano/soltrans": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "sonoma/sct": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "sonoma/santarosa": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "sonoma/smart": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "stanislaus/stanrta": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "stanislaus/turlock": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "sutter/yubasutter": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "trinity/trinity": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "tulare/tcat": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "tulare/visalia": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "tuolumne/tuolumne": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "ventura/govcbus": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "yolo/yolobus": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "yolo/unitrans": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  },
  "yuba/yubasutter_yuba": {
-  "20261020": true
+  "20261020": true,
+  "20261021": true
  }
 }
