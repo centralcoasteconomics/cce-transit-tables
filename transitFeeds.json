@@ -26,6 +26,7 @@
     "_doc": "Wired counties whose registry is knowingly incomplete, so a \"no transit\" result near one of these operators is read as a gap in coverage rather than a fact. Each was checked 2026-09-15.",
     "contra costa": "Tri Delta Transit (East County: Antioch, Pittsburg, Brentwood, Oakley) publishes only via 511.org (API key). County Connection, WestCAT and BART are wired.",
     "kern": "Taft Area Transit and Ridgecrest Transit publish only static document uploads (no refreshable URL); Wasco is a flex feed. GET, Kern Transit, Delano and Arvin are wired.",
+    "los angeles": "Checked 2026-10-21. Torrance Transit and Glendale Beeline sit behind an edge firewall that answers 403 \"Access Denied\" to non-browser clients (both the agency URL and the Transitland current URL), and the Mobility Database holds no mirror for either. Smaller city services (BurbankBus, Beach Cities Transit, Commerce, Arcadia, Baldwin Park, Cerritos on Wheels, West Hollywood, Carson) are not wired. LA Metro Bus and Rail, Foothill, LADOT, Big Blue Bus, AVTA, Metrolink, Long Beach Transit, Culver CityBus, Montebello, Norwalk, GTrans, Pasadena and Santa Clarita are wired.",
     "madera": "Madera Metro (City of Madera) \u2014 Trillium feed calendar ended 2024-02-07 and Cal-ITP's Aug 2026 report still lists that source. Only Madera County Connection (which also serves the city) is wired.",
     "placer": "Auburn Transit publishes only a static document upload (6 stops). Placer County Transit, TART and Roseville are wired.",
     "solano": "Fairfield and Suisun Transit (FAST) and Vacaville City Coach publish only via 511.org (API key); their Trillium feeds ended 2025-07 and 2026-02. Rio Vista Delta Breeze\u2019s feed ended 2021. Only SolTrans (Vallejo/Benicia) is wired.",
@@ -184,6 +185,51 @@
         "id": "bigbluebus",
         "url": "https://gtfs.bigbluebus.com/current.zip",
         "label": "Big Blue Bus (Santa Monica)"
+      },
+      {
+        "id": "avta",
+        "url": "https://www.avta.com/userfiles/files/AVTA_GTFS.zip",
+        "label": "Antelope Valley Transit Authority (AVTA, local + commuter)"
+      },
+      {
+        "id": "metrolink",
+        "url": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "label": "Metrolink (SCRRA commuter rail)"
+      },
+      {
+        "id": "lbt",
+        "url": "https://drive.google.com/uc?export=download&id=1869EVa1z6m_iD6QmvRXyTHtYiaSUBROl",
+        "label": "Long Beach Transit"
+      },
+      {
+        "id": "culvercitybus",
+        "url": "https://web.culvercity.org/gtfs/gtfsexport.zip",
+        "label": "Culver CityBus"
+      },
+      {
+        "id": "montebello",
+        "url": "https://mbl.rideralerts.com/infopoint/gtfs-zip.ashx",
+        "label": "Montebello Bus Lines"
+      },
+      {
+        "id": "norwalk",
+        "url": "https://mystop.norwalktransit.com/InfoPoint/gtfs-zip.ashx",
+        "label": "Norwalk Transit"
+      },
+      {
+        "id": "gtrans",
+        "url": "https://ridegtrans.com/gtfs.zip",
+        "label": "GTrans (Gardena)"
+      },
+      {
+        "id": "pasadena",
+        "url": "https://rt.pasadenatransit.net/rtt/public/resource/gtfs.zip",
+        "label": "Pasadena Transit"
+      },
+      {
+        "id": "santaclarita",
+        "url": "https://apps.santaclaritatransit.com/rtt/public/resource/gtfs.zip",
+        "label": "Santa Clarita Transit"
       }
     ],
     "madera": [
@@ -266,6 +312,11 @@
         "id": "octa",
         "url": "https://www.octa.net/current/google_transit.zip",
         "label": "Orange County Transportation Authority"
+      },
+      {
+        "id": "metrolink_orange",
+        "url": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "label": "Metrolink (SCRRA commuter rail)"
       }
     ],
     "placer": [
@@ -317,6 +368,11 @@
         "id": "banning",
         "url": "http://data.trilliumtransit.com/gtfs/banning-ca-us/banning-ca-us.zip",
         "label": "Banning Transit"
+      },
+      {
+        "id": "metrolink_riverside",
+        "url": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "label": "Metrolink (SCRRA commuter rail)"
       }
     ],
     "sacramento": [
@@ -363,6 +419,11 @@
         "id": "morongo",
         "url": "http://data.trilliumtransit.com/gtfs/morongobasin-ca-us/morongobasin-ca-us.zip",
         "label": "Morongo Basin Transit"
+      },
+      {
+        "id": "metrolink_sb",
+        "url": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "label": "Metrolink (SCRRA commuter rail)"
       }
     ],
     "san diego": [
@@ -375,6 +436,11 @@
         "id": "nctd",
         "url": "https://lfportal.nctd.org/staticGTFS/google_transit.zip",
         "label": "North County Transit District"
+      },
+      {
+        "id": "metrolink_sd",
+        "url": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "label": "Metrolink (SCRRA commuter rail)"
       }
     ],
     "san francisco": [
@@ -584,6 +650,11 @@
         "id": "govcbus",
         "url": "https://govcbus.com/gtfs",
         "label": "Ventura County (combined GTFS)"
+      },
+      {
+        "id": "metrolink_ventura",
+        "url": "https://metrolinktrains.com/globalassets/about/gtfs/gtfs.zip",
+        "label": "Metrolink (SCRRA commuter rail)"
       }
     ],
     "yolo": [
@@ -607,5 +678,5 @@
     ]
   },
   "_mirrorNote": "MTS is served from the Mobility Database mirror because sdmts.com refuses connections from non-browser clients (verified 2026-08-29, same failure class as FEMA). The mirror was checked for currency before wiring \u2014 service window and feed_version both current \u2014 and the feed-vintage machinery will flag it if the mirror ever falls behind.",
-  "_sharedFeedNote": "BART, Caltrain and Eastern Sierra Transit cross county lines. The engine reads feeds per county and requires unique ids, so the same URL is registered once per county it serves (bart / bart_cc / bart_sm, caltrain / caltrain_sf / caltrain_sc, easternsierra / easternsierra_mono). The nightly pipeline downloads each registration separately; the files are under 1 MB."
+  "_sharedFeedNote": "BART, Caltrain, Eastern Sierra Transit and Metrolink cross county lines. The engine reads feeds per county and requires unique ids, so the same URL is registered once per county it serves (bart / bart_cc / bart_sm, caltrain / caltrain_sf / caltrain_sc, easternsierra / easternsierra_mono, metrolink / metrolink_orange / metrolink_riverside / metrolink_sb / metrolink_ventura / metrolink_sd). The nightly pipeline downloads each registration separately; the files are under 1 MB (Metrolink 0.44 MB, 2026-10-21)."
 }
