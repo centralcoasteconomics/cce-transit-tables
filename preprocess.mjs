@@ -16,6 +16,7 @@ import { unzipSync, strFromU8 } from 'fflate'
 import { parse } from 'csv-parse/sync'
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs'
 import { recordNight, flapStatus } from './flap.mjs'
+import { carryDropped } from './carry.mjs'
 
 const AM_START = 7 * 3600, AM_END = 9 * 3600
 const PM_START = 16 * 3600, PM_END = 18 * 3600
@@ -346,7 +347,8 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   const excused = failedFeeds.length > 0 && unexpected.length === 0
   const flapOnly = excused && unregistered.length > 0
   const flapText = unregistered.map((f) => `${f.id} ${flaps.get(f).failed}/${flaps.get(f).nights} nights failed`).join('; ')
-  const note = !excused ? '' : flapOnly ? ` (FLAPPING: ${flapText})` : ' — KNOWN OUTAGE, already acknowledged'
+  let carriedNow = {}
+  let note = !excused ? '' : flapOnly ? ` (FLAPPING: ${flapText})` : ' — KNOWN OUTAGE, already acknowledged'
   const excusedList = flapOnly ? flapping : acknowledged
   // A county whose every feed failed must NOT get an empty table published. The Worker
   // treats a table it can fetch as authoritative, so `{"stops":[]}` would state "no
@@ -380,7 +382,19 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
     const dropped = feeds
       .map((f) => f.label)
       .filter((label) => prev.feeds.includes(label) && !labels.includes(label))
-    if (dropped.length) {
+    // Per-feed hold (carry.mjs): keep only the dropped feeds' own stops from last night and
+    // publish the rest fresh. Still reported (red unless acknowledged or flapping); the whole
+    // county is held only when a dropped feed cannot be carried.
+    const carry = dropped.length ? carryDropped(prev, dropped, TODAY) : null
+    if (carry?.ok) {
+      console.error(`  ${county}: carrying last night's stops for ${dropped.join('; ')} (failed tonight); publishing the other feeds fresh`)
+      stops.push(...carry.stops)
+      labels.push(...dropped)
+      carriedNow = carry.carried
+      note += ` (carried: ${Object.entries(carry.carried).map(([l, d]) => `${l} since ${d}`).join('; ')})`
+      ;(excused ? excusedList : failures).push(`${county}: feed carried forward: ${dropped.join('; ')}${flapOnly ? `; ${flapText}` : ''}`)
+    } else if (dropped.length) {
+      if (carry) console.error(`  ${county}: cannot carry: ${carry.reason}`)
       console.error(
         `  ${county}: ${dropped.length} feed(s) that contributed last night failed tonight (${dropped.join('; ')}) — refusing to publish, keeping the previous table`
       )
@@ -408,9 +422,10 @@ for (const [county, feeds] of Object.entries(COUNTY_FEEDS)) {
   }
 
   const table = { generatedAt: new Date().toISOString(), county, refDate, feeds: labels, stops }
+  if (Object.keys(carriedNow).length) table.carried = carriedNow
   writeFileSync(`tables/${county}.json`, JSON.stringify(table))
   const delta = prev && prev.stops.length ? ` (was ${prev.stops.length})` : ''
-  summary.push(`${county}: ${stops.length} stops${delta}, ${labels.length}/${feeds.length} feeds`)
+  summary.push(`${county}: ${stops.length} stops${delta}, ${labels.length}/${feeds.length} feeds${note}`)
 }
 console.log('\n' + summary.join('\n'))
 if (!only.length) {
@@ -450,7 +465,7 @@ if (acknowledged.length) {
 // Exit non-zero so the nightly GitHub Action goes red. A pipeline that fails silently and
 // commits a degraded table is exactly how Orange County sat at zero stops unnoticed.
 if (failures.length) {
-  console.error(`\n${failures.length} county/counties did not publish:`)
+  console.error(`\n${failures.length} county/counties did not publish cleanly (held, or a feed carried forward):`)
   for (const f of failures) console.error(`  - ${f}`)
   process.exitCode = 1
 }

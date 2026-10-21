@@ -16,3 +16,9 @@ when it has 7+ nights of history, has not failed 3 nights in a row, and failed a
 the last 14 nights (`flap.mjs`; per-feed results in `state/feed-history.json`). The rule
 starts counting from the first nightly after deploy, so it takes effect after about a week.
 `npm test` runs its checks.
+
+**Per-feed hold (2026-10-21).** A feed that contributed last night and fails tonight no longer
+holds its whole county. Its own stops (each stop's `feedSource`) are carried from the previous
+table and every other feed publishes fresh; the table records `carried` (feed label to the first
+night it was carried). After 7 nights of carrying, the old rule applies: the county is held. The
+run still goes red unless the failure is acknowledged or flapping (`carry.mjs`, `test-carry.mjs`).
