@@ -37,6 +37,12 @@ const prev = {
   const r = carryDropped(prev, ['Metrolink', 'Bus B'], '20261021')
   ok('one uncarriable feed holds the county', !r.ok && r.stops.length === 0)
 }
+{
+  const r = carryDropped({ ...prev, generatedAt: '2026-09-20T10:30:00.000Z' }, ['Metrolink'], '20261021')
+  ok('a table held for a month is not carried again', !r.ok, r.reason)
+  const y = carryDropped({ ...prev, generatedAt: '2026-10-20T10:30:00.000Z' }, ['Metrolink'], '20261021')
+  ok('a table built last night counts from last night', y.ok && y.carried.Metrolink === '20261020')
+}
 ok('the reasons carry no em or en dashes', !/[–—]/.test(carryDropped(prev, ['Bus B'], '20261021').reason))
 console.log(`\ntest-carry ${fail ? `${fail} FAILED` : 'all passed'}`)
 process.exit(fail ? 1 : 0)

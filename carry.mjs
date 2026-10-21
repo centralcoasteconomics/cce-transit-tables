@@ -11,7 +11,7 @@ export const MAX_CARRY_NIGHTS = 7
 const dayNum = (ymd) => Date.UTC(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8)) / 86400000
 
 /**
- * @param {{stops: Array<{feedSource?: string}>, carried?: Record<string, string>} | null} prev
+ * @param {{stops: Array<{feedSource?: string}>, carried?: Record<string, string>, generatedAt?: string} | null} prev
  * @param {string[]} dropped labels that contributed to `prev` and failed tonight
  * @param {string} today YYYYMMDD
  * @returns {{ ok: boolean, stops: object[], carried: Record<string, string>, reason: string }}
@@ -22,7 +22,9 @@ export function carryDropped(prev, dropped, today) {
   for (const label of dropped) {
     const own = (prev?.stops ?? []).filter((s) => s.feedSource === label)
     if (own.length === 0) return { ok: false, stops: [], carried: {}, reason: `${label} has no stops of its own in the previous table` }
-    const since = prev?.carried?.[label] ?? today
+    // A table that was itself held is as old as its generatedAt: count from there, never from tonight.
+    const built = typeof prev?.generatedAt === 'string' ? prev.generatedAt.slice(0, 10).replace(/-/g, '') : null
+    const since = prev?.carried?.[label] ?? (built && built < today ? built : today)
     const nights = dayNum(today) - dayNum(since)
     if (nights >= MAX_CARRY_NIGHTS) {
       return { ok: false, stops: [], carried: {}, reason: `${label} has been carried since ${since} (${nights} nights, limit ${MAX_CARRY_NIGHTS})` }
