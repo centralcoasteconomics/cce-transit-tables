@@ -26,7 +26,7 @@
     "_doc": "Wired counties whose registry is knowingly incomplete, so a \"no transit\" result near one of these operators is read as a gap in coverage rather than a fact. Each was checked 2026-09-15.",
     "contra costa": "Tri Delta Transit (East County: Antioch, Pittsburg, Brentwood, Oakley) publishes only via 511.org (API key). County Connection, WestCAT and BART are wired.",
     "kern": "Taft Area Transit and Ridgecrest Transit publish only static document uploads (no refreshable URL); Wasco is a flex feed. GET, Kern Transit, Delano and Arvin are wired.",
-    "los angeles": "Checked 2026-10-21. Torrance Transit and Glendale Beeline sit behind an edge firewall that answers 403 \"Access Denied\" to non-browser clients (both the agency URL and the Transitland current URL), and the Mobility Database holds no mirror for either. Smaller city services (BurbankBus, Beach Cities Transit, Commerce, Arcadia, Baldwin Park, Cerritos on Wheels, West Hollywood, Carson) are not wired. LA Metro Bus and Rail, Foothill, LADOT, Big Blue Bus, AVTA, Metrolink, Long Beach Transit, Culver CityBus, Montebello, Norwalk, GTrans, Pasadena and Santa Clarita are wired.",
+    "los angeles": "Checked 2026-10-22 (first 2026-10-21). Torrance Transit, Glendale Beeline and West Hollywood (CityLine) publish only on CivicPlus city sites behind an edge firewall that answers 403 \"Access Denied\" to every non-browser client tried 2026-10-22 (pipeline, browser and curl user agents alike; agency URLs and the Transitland current URLs, including transit.torranceca.gov/gtfs_feed). No working mirror: the Mobility Database's hosted copies for them (mdb-34, mdb-3177, tld-471, tld-438, tld-4386) are 403 because it cannot fetch them either; its only Glendale copy (mdb-1280) and the OpenMobilityData snapshots for both are 2021 to 2022 timetables (stale, not used); Trillium, LA Metro's los-angeles-regional-gtfs repo and Caltrans' gtfs.dds.dot.ca.gov host none of the three. Next step is asking the cities. Carson Circuit is not wired: its only current-looking feed (rapid.nationalrtap.org upload 11488, file dated 1/3/24) carries routes A and B only with a 2022 service start and a synthetic 2032 end, and the Trillium feed ended 2021-07-01; neither can be trusted as today's service. Wired 2026-10-22 after a plain fetch and a pipeline parse: BurbankBus, Beach Cities Transit, Commerce, Arcadia, Baldwin Park (Passio; the former TecTransIT host no longer resolves) and Cerritos on Wheels. Long Beach Transit's official URL is a Google Drive link, so it carries fallbackUrl = the Mobility Database hosted copy (mdb-1198, byte-identical 2026-10-22). Also wired: LA Metro Bus and Rail, Foothill, LADOT, Big Blue Bus, AVTA, Metrolink, Culver CityBus, Montebello, Norwalk, GTrans, Pasadena and Santa Clarita.",
     "madera": "Madera Metro (City of Madera) \u2014 Trillium feed calendar ended 2024-02-07 and Cal-ITP's Aug 2026 report still lists that source. Only Madera County Connection (which also serves the city) is wired.",
     "placer": "Auburn Transit publishes only a static document upload (6 stops). Placer County Transit, TART and Roseville are wired.",
     "solano": "Fairfield and Suisun Transit (FAST) and Vacaville City Coach publish only via 511.org (API key); their Trillium feeds ended 2025-07 and 2026-02. Rio Vista Delta Breeze\u2019s feed ended 2021. Only SolTrans (Vallejo/Benicia) is wired.",
@@ -199,7 +199,8 @@
       {
         "id": "lbt",
         "url": "https://drive.google.com/uc?export=download&id=1869EVa1z6m_iD6QmvRXyTHtYiaSUBROl",
-        "label": "Long Beach Transit"
+        "label": "Long Beach Transit",
+        "fallbackUrl": "https://files.mobilitydatabase.org/mdb-1198/latest.zip"
       },
       {
         "id": "culvercitybus",
@@ -230,6 +231,36 @@
         "id": "santaclarita",
         "url": "https://apps.santaclaritatransit.com/rtt/public/resource/gtfs.zip",
         "label": "Santa Clarita Transit"
+      },
+      {
+        "id": "burbankbus",
+        "url": "https://rideburbankbus.com/gtfs",
+        "label": "BurbankBus"
+      },
+      {
+        "id": "beachcities",
+        "url": "https://redondobeachbct.com/gtfs",
+        "label": "Beach Cities Transit (Redondo Beach)"
+      },
+      {
+        "id": "commerce",
+        "url": "https://citycommbus.com/gtfs",
+        "label": "Commerce Municipal Bus Lines"
+      },
+      {
+        "id": "arcadia",
+        "url": "https://passio3.com/ArcadiaCity/passioTransit/gtfs/google_transit.zip",
+        "label": "Arcadia Transit"
+      },
+      {
+        "id": "baldwinpark",
+        "url": "https://passio3.com/baldwinpark/passioTransit/gtfs/google_transit.zip",
+        "label": "Baldwin Park Transit"
+      },
+      {
+        "id": "cerritos",
+        "url": "https://passio3.com/cerritos/passioTransit/gtfs/google_transit.zip",
+        "label": "Cerritos on Wheels"
       }
     ],
     "madera": [

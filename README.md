@@ -22,3 +22,8 @@ holds its whole county. Its own stops (each stop's `feedSource`) are carried fro
 table and every other feed publishes fresh; the table records `carried` (feed label to the first
 night it was carried). After 7 nights of carrying, the old rule applies: the county is held. The
 run still goes red unless the failure is acknowledged or flapping (`carry.mjs`, `test-carry.mjs`).
+
+**Fallback URL (2026-10-22).** A feed in `transitFeeds.json` may carry `fallbackUrl`: a second
+host of the same feed, tried only after `url` fails all its attempts (`fallback.mjs`,
+`test-fallback.mjs`). The run log says when a table was built from it. Long Beach Transit uses it
+(official Google Drive link first, then the Mobility Database hosted copy, mdb-1198).

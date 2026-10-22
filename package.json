@@ -8,6 +8,6 @@
     "fflate": "^0.8.2"
   },
   "scripts": {
-    "test": "node test-flap.mjs && node test-carry.mjs"
+    "test": "node test-flap.mjs && node test-carry.mjs && node test-fallback.mjs"
   }
 }

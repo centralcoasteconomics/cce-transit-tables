@@ -17,6 +17,7 @@ import { parse } from 'csv-parse/sync'
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs'
 import { recordNight, flapStatus } from './flap.mjs'
 import { carryDropped } from './carry.mjs'
+import { downloadWithFallback } from './fallback.mjs'
 
 const AM_START = 7 * 3600, AM_END = 9 * 3600
 const PM_START = 16 * 3600, PM_END = 18 * 3600
@@ -123,11 +124,11 @@ function pick(line, start, end, wanted) {
 // of guessed at — see the misdiagnosis of 2026-09-07.
 const DOWNLOAD_ATTEMPTS = 2
 const RETRY_DELAY_MS = 20_000
-async function downloadZip(feed) {
+async function downloadZipFrom(feed, url) {
   let lastErr
   for (let attempt = 1; attempt <= DOWNLOAD_ATTEMPTS; attempt++) {
     try {
-      const res = await fetch(feed.url, { headers: { 'User-Agent': 'cce-transit-tables (Central Coast Economics; nightly GTFS preprocessing)' }, redirect: 'follow' })
+      const res = await fetch(url, { headers: { 'User-Agent': 'cce-transit-tables (Central Coast Economics; nightly GTFS preprocessing)' }, redirect: 'follow' })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const bytes = new Uint8Array(await res.arrayBuffer())
       try {
@@ -147,9 +148,15 @@ async function downloadZip(feed) {
   }
   throw lastErr
 }
+// `url` first (with its retries), then `fallbackUrl` when the feed has one (fallback.mjs).
+async function downloadZip(feed) {
+  const r = await downloadWithFallback(feed, (url) => downloadZipFrom(feed, url), (m) => console.warn(m))
+  if (r.usedFallback) console.warn(`  ${feed.id}: built from fallbackUrl ${r.url}`)
+  return r.zip
+}
 
 async function processFeed(feed) {
-  console.log(`  ${feed.id}: downloading ${feed.url}`)
+  console.log(`  ${feed.id}: downloading ${feed.url}${feed.fallbackUrl ? ` (fallback ${feed.fallbackUrl})` : ''}`)
   const zip = await downloadZip(feed)
   const stops = new Map()
   for (const r of csv(zip['stops.txt'])) {
